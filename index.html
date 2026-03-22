@@ -982,7 +982,7 @@
     <button class="ctrl-btn" id="btn-load-pano" title="Laad een lokaal equirectangulaire panoramabestand">⬆ Panorama laden</button>
     <input type="file" id="pano-file-input" accept="image/*" style="display:none">
     <button class="ctrl-btn" id="btn-autoplay">⟳ Rondleiding</button>
-    <button class="ctrl-btn" id="btn-toggle-panel">Paneel ◧</button>
+    <button class="ctrl-btn" id="btn-toggle-panel">Details ◧</button>
     <button class="ctrl-btn" id="btn-editor" style="border-color:rgba(201,168,76,0.45);color:var(--gold)">✎ Bewerken</button>
   </div>
 </div>
@@ -3353,7 +3353,7 @@ document.getElementById('btn-toggle-panel').addEventListener('click', () => {
   panel.style.display = panelVisible ? '' : 'none';
   div.style.display   = panelVisible ? '' : 'none';
   document.getElementById('btn-toggle-panel').textContent =
-    panelVisible ? 'Paneel ◧' : 'Paneel ◨';
+    panelVisible ? 'Details ◧' : 'Details ◨';
 });
 
 // ═══════════════════════════════════════════════════════
