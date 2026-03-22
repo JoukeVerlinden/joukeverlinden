@@ -761,24 +761,31 @@
     #panel-header .panel-meta { display: none; }
     #panel-header .ornament { display: none; }
 
-    /* ── Hint — inside viewer portion, smaller, touch-friendly ── */
+    /* ── Hint — full-screen overlay on mobile ── */
     #start-hint {
       position: fixed;
-      /* Viewer is 60% of (100vh - 36px topbar). Bottom of viewer ≈ 36px + 60%*(100vh-36px) */
-      bottom: calc(40% + 8px);  /* just above the panel */
-      left: 8px; right: 8px;
-      top: auto;
+      inset: 0;
+      bottom: 0; right: 0;
       z-index: 8000;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
+      background: rgba(5,3,1,0.6);
+      padding: 16px;
     }
+    #start-hint-inner {
+      padding: 16px 16px 12px;
+      gap: 9px;
+      max-width: 100%;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    #start-hint-welcome { font-size: 15px; padding-bottom: 8px; }
+    .sh-text { font-size: 12px; line-height: 1.45; }
+    .sh-icon { font-size: 14px; }
     .sh-text kbd { display: none; }
-    #start-hint-inner { padding: 12px 14px 10px; gap: 7px; max-width: 100%; width: 100%; }
-    #start-hint-welcome { font-size: 14px; padding-bottom: 7px; }
-    .sh-text { font-size: 11.5px; line-height: 1.4; }
-    .sh-icon { font-size: 13px; }
-    #start-hint-close { font-size: 10px; padding: 4px 14px; }
+    #start-hint-close { font-size: 10px; padding: 5px 18px; margin-top: 4px; }
   }
 
   /* ── LOADING SCREEN ── */
@@ -2763,7 +2770,7 @@ function uploadTexture(img) {
   if (glTexture) gl.deleteTexture(glTexture);
   glTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, glTexture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   // Mip-map for better quality when zoomed out
@@ -2798,7 +2805,7 @@ function loadPanoSrc(src) {
     panoReady = true;
   };
   panoImg.onerror = () => console.warn('Panorama image failed to load.');
-  panoImg.crossOrigin = 'anonymous'; // must be set before src
+  // Do NOT set crossOrigin for local/same-origin files — causes CORS failure
   panoImg.src = src;
 }
 
