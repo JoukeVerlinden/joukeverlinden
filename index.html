@@ -748,6 +748,7 @@
       border-top: 1px solid var(--panel-border);
     }
     #viewer-wrap { height: 55%; flex: none; }
+    #start-hint { right: 0; bottom: 45%; }
   }
 
   /* ── LOADING SCREEN ── */
@@ -831,6 +832,101 @@
     0%,100% { opacity: 1; }
     50% { opacity: 0.2; }
   }
+
+  /* ── STARTUP HINT OVERLAY ── */
+  #start-hint {
+    position: fixed;
+    /* Align bottom with viewer controls (bottom: 20px).
+       Centre horizontally in the viewer area (viewport minus 380px side panel). */
+    bottom: 20px;
+    left: 0;
+    /* Side panel is 380px — viewer occupies the rest */
+    right: 380px;
+    z-index: 8000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s;
+  }
+  #start-hint.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  #start-hint.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #start-hint-inner {
+    background: rgba(10,8,5,0.80);
+    border: 1px solid rgba(201,168,76,0.35);
+    backdrop-filter: blur(12px);
+    padding: 20px 24px 16px;
+    max-width: 420px;
+    width: calc(100% - 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  #start-hint-welcome {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+  .sh-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .sh-icon {
+    font-size: 16px;
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    margin-top: 1px;
+  }
+  .sh-text {
+    font-family: var(--body-serif);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: rgba(232,211,176,0.85);
+  }
+  .sh-text strong { color: var(--parchment); font-weight: 500; }
+  .sh-text em { font-style: italic; color: var(--gold-light); }
+  .sh-text kbd {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 2px;
+    padding: 1px 5px;
+    color: var(--gold-light);
+  }
+  #start-hint-close {
+    align-self: flex-end;
+    margin-top: 4px;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold-light);
+    font-family: var(--body-serif);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+    border-radius: 1px;
+  }
+  #start-hint-close:hover {
+    background: rgba(201,168,76,0.3);
+    color: #fff;
+  }
 </style>
 </head>
 <body>
@@ -851,15 +947,15 @@
 
   <div id="active-indicator">
     <div id="active-dot"></div>
-    Viewing: <span id="active-label">—</span>
+    Bekijkt: <span id="active-label">—</span>
   </div>
 
   <div class="controls">
-    <button class="ctrl-btn" id="btn-load-pano" title="Load a local equirectangular panorama image">⬆ Load Panorama</button>
+    <button class="ctrl-btn" id="btn-load-pano" title="Laad een lokaal equirectangulaire panoramabestand">⬆ Panorama laden</button>
     <input type="file" id="pano-file-input" accept="image/*" style="display:none">
-    <button class="ctrl-btn" id="btn-autoplay">⟳ Auto-tour</button>
-    <button class="ctrl-btn" id="btn-toggle-panel">Panel ◧</button>
-    <button class="ctrl-btn" id="btn-editor" style="border-color:rgba(201,168,76,0.45);color:var(--gold)">✎ Edit</button>
+    <button class="ctrl-btn" id="btn-autoplay">⟳ Rondleiding</button>
+    <button class="ctrl-btn" id="btn-toggle-panel">Paneel ◧</button>
+    <button class="ctrl-btn" id="btn-editor" style="border-color:rgba(201,168,76,0.45);color:var(--gold)">✎ Bewerken</button>
   </div>
 </div>
 
@@ -881,19 +977,19 @@
 
     <!-- Viewer controls: reset + zoom -->
     <div id="viewer-controls">
-      <button class="vc-btn" id="btn-reset-view" title="Reset to default view">
+      <button class="vc-btn" id="btn-reset-view" title="Terug naar beginpositie">
         <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M10 3L3 9h2.5v8h9V9H17L10 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/>
         </svg>
       </button>
       <div class="vc-divider"></div>
-      <button class="vc-btn" id="btn-zoom-in"  title="Zoom in">+</button>
+      <button class="vc-btn" id="btn-zoom-in"  title="Inzoomen">+</button>
       <div id="zoom-indicator">90°</div>
-      <button class="vc-btn" id="btn-zoom-out" title="Zoom out">−</button>
+      <button class="vc-btn" id="btn-zoom-out" title="Uitzoomen">−</button>
     </div>
 
     <!-- Hint -->
-    <div id="viewer-hint">Drag to explore · Click markers to discover</div>
+    <div id="viewer-hint">Sleep om te verkennen · Klik op markers om te ontdekken</div>
 
     <!-- Pick mode ghost overlay -->
     <svg id="pick-ghost-svg" xmlns="http://www.w3.org/2000/svg">
@@ -908,8 +1004,32 @@
     </svg>
   </div>
 
+  <!-- Startup hint overlay -->
+  <div id="start-hint">
+    <div id="start-hint-inner">
+      <div id="start-hint-welcome"></div>
+      <div class="sh-row">
+        <span class="sh-icon">↔</span>
+        <span class="sh-text"><strong>Verkennen</strong> — sleep het beeld om rond te kijken</span>
+      </div>
+      <div class="sh-row">
+        <span class="sh-icon">⊕</span>
+        <span class="sh-text"><strong>Inzoomen</strong> — scroll of gebruik <kbd>+</kbd> / <kbd>−</kbd> om markeringen zichtbaar te maken</span>
+      </div>
+      <div class="sh-row">
+        <span class="sh-icon">⌂</span>
+        <span class="sh-text"><strong>Beginpositie</strong> — klik het huis-icoon rechtsonder om terug te keren</span>
+      </div>
+      <div class="sh-row">
+        <span class="sh-icon">⟳</span>
+        <span class="sh-text"><strong>Rondleiding</strong> — klik <em>Rondleiding</em> bovenaan voor een automatische tour</span>
+      </div>
+      <button id="start-hint-close">Begrepen</button>
+    </div>
+  </div>
+
   <!-- Pick escape banner (shown outside viewer-wrap so always visible) -->
-  <div id="pick-banner">Click top-left corner · Esc to cancel</div>
+  <div id="pick-banner">Klik linksboven op het panorama · Esc om te annuleren</div>
 
   <!-- Divider -->
   <div id="divider"></div>
@@ -934,19 +1054,19 @@
 
   <div id="editor-modal">
     <div id="editor-header">
-      <div id="editor-title">Hotspot Editor</div>
+      <div id="editor-title">Markering bewerken</div>
       <div id="editor-header-btns">
-        <button class="ed-btn ed-btn-primary" id="ed-btn-export">⬇ Export annotations.js</button>
-        <button class="ed-btn" id="ed-btn-close">✕ Close</button>
+        <button class="ed-btn ed-btn-primary" id="ed-btn-export">⬇ Exporteer annotations.js</button>
+        <button class="ed-btn" id="ed-btn-close">✕ Sluiten</button>
       </div>
     </div>
 
     <!-- LIST VIEW -->
     <div id="ed-list-view">
       <div id="ed-list-toolbar">
-        <button class="ed-btn ed-btn-primary" id="ed-btn-add-point">+ Point hotspot</button>
-        <button class="ed-btn ed-btn-primary" id="ed-btn-add-inscription">+ Inscription rect</button>
-        <span id="ed-list-hint">Current view: <span id="ed-cur-yaw">—</span>° yaw / <span id="ed-cur-pitch">—</span>° pitch</span>
+        <button class="ed-btn ed-btn-primary" id="ed-btn-add-point">+ Punt markering</button>
+        <button class="ed-btn ed-btn-primary" id="ed-btn-add-inscription">+ Inscriptie rechthoek</button>
+        <span id="ed-list-hint">Huidige weergave: <span id="ed-cur-yaw">—</span>° yaw / <span id="ed-cur-pitch">—</span>° pitch</span>
       </div>
       <div id="ed-hotspot-list"></div>
     </div>
@@ -954,8 +1074,8 @@
     <!-- FORM VIEW -->
     <div id="ed-form-view" style="display:none">
       <div id="ed-form-nav">
-        <button class="ed-btn" id="ed-btn-back">← Back to list</button>
-        <span id="ed-form-title">Edit hotspot</span>
+        <button class="ed-btn" id="ed-btn-back">← Terug naar lijst</button>
+        <span id="ed-form-title">Markering bewerken</span>
       </div>
 
       <div id="ed-form-body">
@@ -964,49 +1084,49 @@
             <div class="ed-field">
               <label>Type</label>
               <select id="ef-type">
-                <option value="point">Point</option>
-                <option value="inscription">Inscription</option>
+                <option value="point">Punt</option>
+                <option value="inscription">Inscriptie</option>
               </select>
             </div>
             <div class="ed-field">
-              <label>ID <span class="ed-hint">(unique, no spaces)</span></label>
+              <label>ID <span class="ed-hint">(uniek, geen spaties)</span></label>
               <input type="text" id="ef-id" placeholder="e.g. altar-01">
             </div>
           </div>
           <div class="ed-field-row">
             <div class="ed-field">
-              <label>Title</label>
+              <label>Titel</label>
               <input type="text" id="ef-title" placeholder="Short display name">
             </div>
             <div class="ed-field">
-              <label>Date / Location</label>
+              <label>Datum / Locatie</label>
               <input type="text" id="ef-date" placeholder="e.g. 1704 · South nave">
             </div>
           </div>
           <div class="ed-field">
-            <label>Image URL</label>
-            <input type="text" id="ef-image" placeholder="https://… or relative path">
+            <label>Afbeelding URL</label>
+            <input type="text" id="ef-image" placeholder="https://… of relatief pad">
           </div>
           <div class="ed-field-row">
             <div class="ed-field">
-              <label>Zoom (FOV °) <span class="ed-hint">20–120 · smaller = more zoomed in</span></label>
+              <label>Zoom (FOV °) <span class="ed-hint">20–120 · kleiner = meer ingezoomd</span></label>
               <input type="number" id="ef-zoom" min="20" max="120" step="1" placeholder="90 (default)">
             </div>
-            <button class="ed-btn ed-btn-capture" id="ef-capture-zoom" title="Use current zoom level">⊕ Use current</button>
+            <button class="ed-btn ed-btn-capture" id="ef-capture-zoom" title="Use current zoom level">⊕ Gebruik huidig</button>
           </div>
           <div class="ed-field">
-            <label>Content <span class="ed-hint">(HTML allowed: &lt;strong&gt;, &lt;em&gt;)</span></label>
+            <label>Inhoud <span class="ed-hint">(HTML toegestaan: &lt;strong&gt;, &lt;em&gt;)</span></label>
             <textarea id="ef-content" rows="4"></textarea>
           </div>
           <div class="ed-field">
-            <label>Related hotspots <span class="ed-hint">(Ctrl/Cmd+click for multiple)</span></label>
+            <label>Gerelateerde markeringen <span class="ed-hint">(Ctrl/Cmd+klik voor meerdere)</span></label>
             <select id="ef-links" multiple size="4"></select>
           </div>
         </div>
 
         <!-- POINT-only fields -->
         <div class="ed-form-section" id="ed-section-point">
-          <div class="ed-section-label">Point position</div>
+          <div class="ed-section-label">Punt positie</div>
           <div class="ed-field-row">
             <div class="ed-field">
               <label>Yaw °</label>
@@ -1016,18 +1136,18 @@
               <label>Pitch °</label>
               <input type="number" id="ef-pitch" step="0.1" placeholder="0">
             </div>
-            <button class="ed-btn ed-btn-capture" id="ef-capture-point" title="Use current camera view">⊕ Capture</button>
+            <button class="ed-btn ed-btn-capture" id="ef-capture-point" title="Use current camera view">⊕ Vastleggen</button>
           </div>
         </div>
 
         <!-- INSCRIPTION-only fields -->
         <div class="ed-form-section" id="ed-section-inscription" style="display:none">
-          <div class="ed-section-label">Rectangle corners <span class="ed-hint">[yaw°, pitch°] — TL, TR, BR, BL</span></div>
+          <div class="ed-section-label">Rechthoek hoeken <span class="ed-hint">[yaw°, pitch°] — LB, RB, RO, LO</span></div>
 
           <!-- Interactive pick strip -->
           <div id="ed-pick-strip">
-            <button class="ed-btn ed-btn-pick" id="ef-pick-tl">⊕ Pick top-left</button>
-            <button class="ed-btn ed-btn-pick" id="ef-pick-br">⊕ Pick bottom-right</button>
+            <button class="ed-btn ed-btn-pick" id="ef-pick-tl">⊕ Kies linksboven</button>
+            <button class="ed-btn ed-btn-pick" id="ef-pick-br">⊕ Kies rechtsonder</button>
             <span id="ed-pick-status"></span>
           </div>
 
@@ -1050,18 +1170,18 @@
             </div>
           </div>
           <div class="ed-field">
-            <label>Transcription <span class="ed-hint">(one line per row)</span></label>
+            <label>Transcriptie <span class="ed-hint">(één regel per rij)</span></label>
             <textarea id="ef-transcription" rows="6" placeholder="D · O · M&#10;BASILICAM · HANC…"></textarea>
           </div>
           <div class="ed-field">
-            <label>Translation</label>
+            <label>Vertaling</label>
             <textarea id="ef-translation" rows="2" placeholder="English rendering…"></textarea>
           </div>
         </div>
 
         <div id="ed-form-actions">
-          <button class="ed-btn ed-btn-danger" id="ed-btn-delete">🗑 Delete</button>
-          <button class="ed-btn ed-btn-primary" id="ed-btn-save">Save hotspot</button>
+          <button class="ed-btn ed-btn-danger" id="ed-btn-delete">🗑 Verwijderen</button>
+          <button class="ed-btn ed-btn-primary" id="ed-btn-save">Opslaan</button>
         </div>
       </div>
     </div>
@@ -1069,12 +1189,12 @@
     <!-- EXPORT VIEW -->
     <div id="ed-export-view" style="display:none">
       <div id="ed-form-nav">
-        <button class="ed-btn" id="ed-btn-export-back">← Back</button>
-        <span id="ed-form-title">Export — copy the text below into annotations.js</span>
+        <button class="ed-btn" id="ed-btn-export-back">← Terug</button>
+        <span id="ed-form-title">Exporteer — kopieer de tekst hieronder naar annotations.js</span>
       </div>
       <textarea id="ed-export-textarea" readonly spellcheck="false"></textarea>
       <div id="ed-export-actions">
-        <button class="ed-btn ed-btn-primary" id="ed-btn-copy">⎘ Copy to clipboard</button>
+        <button class="ed-btn ed-btn-primary" id="ed-btn-copy">⎘ Kopieer naar klembord</button>
         <span id="ed-copy-confirm" style="opacity:0;transition:opacity 0.4s;font-style:italic;color:var(--gold)">Copied!</span>
       </div>
     </div>
@@ -2099,13 +2219,13 @@ function edReadForm() {
 // ── Save / Delete ────────────────────────────────────────
 document.getElementById('ed-btn-save').addEventListener('click', () => {
   const hs = edReadForm();
-  if (!hs.id)    { alert('Please enter an ID.'); return; }
-  if (!hs.title) { alert('Please enter a title.'); return; }
+  if (!hs.id)    { alert('Vul een ID in.'); return; }
+  if (!hs.title) { alert('Vul een titel in.'); return; }
 
   // Check for duplicate ID (ignore self when editing)
   const dupIdx = HOTSPOTS.findIndex(h => h.id === hs.id);
   if (dupIdx !== -1 && dupIdx !== edEditingIdx) {
-    alert(`ID "${hs.id}" is already used by hotspot #${dupIdx + 1}. Please choose a unique ID.`);
+    alert(`ID "${hs.id}" is al in gebruik door markering #${dupIdx + 1}. Kies een uniek ID.`);
     return;
   }
 
@@ -2122,7 +2242,7 @@ document.getElementById('ed-btn-save').addEventListener('click', () => {
 document.getElementById('ed-btn-delete').addEventListener('click', () => {
   if (edEditingIdx < 0) return;
   const hs = HOTSPOTS[edEditingIdx];
-  if (!confirm(`Delete "${hs.title}"?`)) return;
+  if (!confirm(`Verwijder "${hs.title}"?`)) return;
   HOTSPOTS.splice(edEditingIdx, 1);
   edRebuildViewer();
   edShowList();
@@ -2203,14 +2323,14 @@ function enterPickMode(which) {
   document.getElementById('editor-overlay').style.pointerEvents = 'none';
   document.getElementById('pick-banner').textContent =
     which === 'tl'
-      ? 'Click the TOP-LEFT corner of the inscription · Esc to cancel'
-      : 'Click the BOTTOM-RIGHT corner of the inscription · Esc to cancel';
+      ? 'Klik op de linkerbovenhoek van de inscriptie · Esc om te annuleren'
+      : 'Klik op de rechteronderhoek van de inscriptie · Esc om te annuleren';
 
   // Highlight active button
   document.getElementById('ef-pick-tl').classList.toggle('picking', which === 'tl');
   document.getElementById('ef-pick-br').classList.toggle('picking', which === 'br');
   document.getElementById('ed-pick-status').textContent =
-    which === 'tl' ? '→ click top-left on panorama' : '→ click bottom-right on panorama';
+    which === 'tl' ? '→ klik linksboven op het panorama' : '→ klik rechtsonder op het panorama';
 
   // If we're picking BR and TL already set, show anchor dot
   if (which === 'br') {
@@ -2309,7 +2429,7 @@ function edBuildExportText() {
 
   out += `// ═══════════════════════════════════════════════════════\n`;
   out += `//  annotations.js — Heritage 360° Viewer · Content File\n`;
-  out += `//  Generated by the built-in editor.\n`;
+  out += `//  Gegenereerd door de ingebouwde editor.\n`;
   out += `// ═══════════════════════════════════════════════════════\n\n`;
 
   out += `const SITE_CONFIG = {\n`;
@@ -2490,6 +2610,13 @@ let autoTour = false, autoTourIndex = 0, autoTourTimer = null;
 let fovH = 90, targetFovH = 90;
 const FOV_MIN = 20, FOV_MAX = 120;
 
+// Home swing — slow ease-in-out yaw oscillation when at home position
+let homeSwing = false;
+let homeSwingStart = 0;
+const HOME_SWING_YAW_A = 200;  // degrees — left bound
+const HOME_SWING_YAW_B = 345;  // degrees — right bound
+const HOME_SWING_PERIOD = 40000; // ms per full back-and-forth
+
 // ── Pitch limit (FOV-aware, ceiling/floor never reachable) ──
 // vFOV is derived via atan(tan(hFOV/2) * aspect) — correct tangent projection.
 // A linear multiply of hFOV*aspect is wrong and lets you overshoot the poles.
@@ -2635,7 +2762,7 @@ function drawFallback() {
   ctx2d.fillStyle = 'rgba(201,168,76,0.45)';
   ctx2d.textAlign = 'center';
   const panoName = (typeof SITE_CONFIG !== 'undefined' && SITE_CONFIG.panoramaFile) || 'theroom.jpg';
-  ctx2d.fillText('Place ' + panoName + ' alongside this file — or use ⬆ Load Panorama', W * 0.5, H * 0.5);
+  ctx2d.fillText('Plaats ' + panoName + ' naast dit bestand — of gebruik ⬆ Panorama laden', W * 0.5, H * 0.5);
   ctx2d.textAlign = 'left';
 }
 
@@ -2684,6 +2811,14 @@ function drawPanorama() {
 //  ANIMATION LOOP
 // ═══════════════════════════════════════════════════════
 function tick() {
+  // Home swing — ease-in-out oscillation between HOME_SWING_YAW_A and B
+  if (homeSwing) {
+    const t = ((performance.now() - homeSwingStart) % HOME_SWING_PERIOD) / HOME_SWING_PERIOD;
+    // Ease-in-out via cosine: 0→1→0 mapped to A→B→A
+    const ease = (1 - Math.cos(t * 2 * Math.PI)) / 2;
+    targetYaw = HOME_SWING_YAW_A + ease * (HOME_SWING_YAW_B - HOME_SWING_YAW_A);
+  }
+
   fovH        += (targetFovH   - fovH)   * 0.1;
   targetPitch  = clampPitch(targetPitch);
   yaw         += (targetYaw   - yaw)    * 0.08;
@@ -2713,7 +2848,18 @@ function tick() {
 // ═══════════════════════════════════════════════════════
 //  INTERACTION
 // ═══════════════════════════════════════════════════════
+// ── Startup hint dismiss ─────────────────────────────
+function dismissHint() {
+  const h = document.getElementById('start-hint');
+  if (!h || !h.classList.contains('visible')) return;
+  h.classList.add('fade-out');
+  setTimeout(() => h.remove(), 650);
+}
+document.getElementById('start-hint-close')?.addEventListener('click', dismissHint);
+
 canvas.addEventListener('mousedown', e => {
+  dismissHint();
+  homeSwing = false;
   if (pickMode) return;
   isDragging = true; lastX = e.clientX; lastY = e.clientY;
 });
@@ -2726,6 +2872,7 @@ window.addEventListener('mousemove', e => {
 window.addEventListener('mouseup', () => isDragging = false);
 
 canvas.addEventListener('touchstart', e => {
+  homeSwing = false;
   if (e.touches.length === 1) {
     isDragging = true;
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
@@ -2760,6 +2907,8 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', e => { if (e.touches.length < 2) lastPinchDist = null; });
 
 canvas.addEventListener('wheel', e => {
+  dismissHint();
+  homeSwing = false;
   e.preventDefault();
   targetFovH = Math.max(FOV_MIN, Math.min(FOV_MAX, targetFovH + (e.deltaY > 0 ? 6 : -6)));
 }, { passive: false });
@@ -2987,12 +3136,12 @@ function buildPanel() {
         '<span class="line"><span class="line-num">' + (li+1) + '</span>' + line + '</span>'
       ).join('\n');
       const translationHTML = hs.translation
-        ? '<div class="inscription-translation"><strong>Translation</strong>' + hs.translation + '</div>'
+        ? '<div class="inscription-translation"><strong>Vertaling</strong>' + hs.translation + '</div>'
         : '';
       inscriptionHTML =
         '<div class="inscription-block">' +
         (hs.image ? '<img class="inscription-bitmap" src="' + hs.image + '" alt="Inscription photograph" loading="lazy">' : '') +
-        '<div class="inscription-label">Transcription · Latin text</div>' +
+        '<div class="inscription-label">Transcriptie · Latijnse tekst</div>' +
         '<div class="inscription-transcription">' + lines + '</div>' +
         translationHTML +
         '</div>';
@@ -3012,7 +3161,7 @@ function buildPanel() {
       }).filter(Boolean).join('');
       if (chips) {
         seeAlsoHTML = '<div class="see-also">' +
-          '<div class="see-also-label">See also</div>' +
+          '<div class="see-also-label">Zie ook</div>' +
           '<div class="see-also-chips">' + chips + '</div>' +
         '</div>';
       }
@@ -3036,7 +3185,7 @@ function buildPanel() {
         '<button class="look-at-btn" data-id="' + hs.id + '">' +
           '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/>' +
           '<path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8-10-8-10-8z"/></svg>' +
-          'View in 360°' +
+          'Bekijk in 360°' +
         '</button>' +
       '</div>';
 
@@ -3062,6 +3211,7 @@ function buildPanel() {
 let activeId = null;
 
 function setActive(id, fromPanel = false) {
+  homeSwing = false;
   activeId = id;
   const hs = HOTSPOTS.find(h => h.id === id);
 
@@ -3119,7 +3269,7 @@ function startAutoTour() {
 }
 function stopAutoTour() {
   autoTour = false; clearTimeout(autoTourTimer);
-  document.getElementById('btn-autoplay').textContent = '⟳ Auto-tour';
+  document.getElementById('btn-autoplay').textContent = '⟳ Rondleiding';
 }
 function runAutoTour() {
   if (!autoTour) return;
@@ -3140,7 +3290,7 @@ document.getElementById('btn-toggle-panel').addEventListener('click', () => {
   panel.style.display = panelVisible ? '' : 'none';
   div.style.display   = panelVisible ? '' : 'none';
   document.getElementById('btn-toggle-panel').textContent =
-    panelVisible ? 'Panel ◧' : 'Panel ◨';
+    panelVisible ? 'Paneel ◧' : 'Paneel ◨';
 });
 
 // ═══════════════════════════════════════════════════════
@@ -3197,6 +3347,12 @@ function init() {
     set('panel-label',   cfg.panelLabel);
     set('panel-heading', cfg.panelHeading);
     set('panel-meta',    cfg.panelMeta);
+    // Welcome title: "Welkom bij <first part of siteTitle>"
+    const welcomeEl = document.getElementById('start-hint-welcome');
+    if (welcomeEl && cfg.siteTitle) {
+      const firstPart = cfg.siteTitle.split(/\s*[\u00b7·]\s*/)[0].trim();
+      welcomeEl.textContent = 'Welkom bij ' + firstPart;
+    }
   }
 
   // Seed starting view from config defaults
@@ -3217,6 +3373,10 @@ function init() {
     document.querySelectorAll('.hotspot, .rect-hotspot-group, .annotation-entry')
       .forEach(el => el.classList.remove('active'));
     document.getElementById('active-label').textContent = '—';
+    // Start oscillation at zoom 100
+    targetFovH = 100;
+    homeSwing = true;
+    homeSwingStart = performance.now();
   });
   initGL();
   resizeCanvas();
@@ -3227,6 +3387,13 @@ function init() {
   setTimeout(() => {
     document.getElementById('loading').classList.add('fade-out');
     setTimeout(() => document.getElementById('loading').remove(), 900);
+    // Show startup hint after loading screen fades
+    const hint = document.getElementById('start-hint');
+    if (hint) setTimeout(() => hint.classList.add('visible'), 400);
+    // Start home oscillation at zoom 100
+    targetFovH = 100;
+    homeSwing = true;
+    homeSwingStart = performance.now();
   }, 1600);
 }
 
