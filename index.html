@@ -750,6 +750,7 @@
     #topbar .site-subtitle { display: none; }
     #active-indicator { display: none; }
     #btn-load-pano, #pano-file-input, #btn-editor { display: none; }
+    #editor-overlay { display: none !important; }
     #btn-toggle-panel { display: none; } /* panel always visible on mobile */
     .ctrl-btn { font-size: 10px; padding: 4px 10px; }
 
@@ -2783,23 +2784,38 @@ function uploadTexture(img) {
   const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE);
   let w = img.naturalWidth  || img.width;
   let h = img.naturalHeight || img.height;
+  const needsScale = w > maxTex || h > maxTex;
 
-  // Scale down if image exceeds the driver's texture size limit (common on Firefox/mobile)
-  if (w > maxTex || h > maxTex) {
+  let source = img;
+
+  if (needsScale) {
+    // Must scale — use offscreen canvas
     const scale = maxTex / Math.max(w, h);
     w = Math.floor(w * scale);
     h = Math.floor(h * scale);
+    try {
+      const oc = document.createElement('canvas');
+      oc.width = w; oc.height = h;
+      oc.getContext('2d').drawImage(img, 0, 0, w, h);
+      source = oc;
+    } catch (e) {
+      // Tainted canvas (local file on mobile) — upload img directly at original size
+      // and clamp w/h back for mipmap check
+      source = img;
+      w = img.naturalWidth || img.width;
+      h = img.naturalHeight || img.height;
+    }
   }
-
-  const oc = document.createElement('canvas');
-  oc.width  = w;
-  oc.height = h;
-  oc.getContext('2d').drawImage(img, 0, 0, w, h);
 
   if (glTexture) gl.deleteTexture(glTexture);
   glTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, glTexture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, oc);
+  try {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+  } catch (e) {
+    // Last resort: try uploading the raw image element
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+  }
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   if (isPowerOf2(w) && isPowerOf2(h)) {
