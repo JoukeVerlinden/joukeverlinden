@@ -2846,11 +2846,12 @@ function updateHotspots() {
       if (!el) return;
       const { x, y: py, behind } = projectPoint(hs.yaw, hs.pitch);
       const onScreen = !behind && x > -40 && x < W + 40 && py > -40 && py < H + 40;
+      const visible  = onScreen && fovH < 76;
       el.style.left = x + 'px';
       el.style.top  = py + 'px';
-      el.style.opacity       = onScreen ? '1' : '0';
-      el.style.pointerEvents = onScreen ? 'all' : 'none';
-      el._screenX = x; el._screenY = py; el._onScreen = onScreen;
+      el.style.opacity       = visible ? '1' : '0';
+      el.style.pointerEvents = visible ? 'all' : 'none';
+      el._screenX = x; el._screenY = py; el._onScreen = visible;
     }
   });
 
@@ -3226,7 +3227,6 @@ function init() {
   setTimeout(() => {
     document.getElementById('loading').classList.add('fade-out');
     setTimeout(() => document.getElementById('loading').remove(), 900);
-    setActive(HOTSPOTS[0].id);
   }, 1600);
 }
 
