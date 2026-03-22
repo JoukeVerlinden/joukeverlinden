@@ -2780,22 +2780,29 @@ function initGL() {
 function uploadTexture(img) {
   if (!gl) return;
 
-  // Draw to offscreen canvas first — Firefox requires fully decoded pixels
-  // and rejects direct HTMLImageElement uploads in some configurations.
+  const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  let w = img.naturalWidth  || img.width;
+  let h = img.naturalHeight || img.height;
+
+  // Scale down if image exceeds the driver's texture size limit (common on Firefox/mobile)
+  if (w > maxTex || h > maxTex) {
+    const scale = maxTex / Math.max(w, h);
+    w = Math.floor(w * scale);
+    h = Math.floor(h * scale);
+  }
+
   const oc = document.createElement('canvas');
-  oc.width  = img.naturalWidth  || img.width;
-  oc.height = img.naturalHeight || img.height;
-  const octx = oc.getContext('2d');
-  octx.drawImage(img, 0, 0);
+  oc.width  = w;
+  oc.height = h;
+  oc.getContext('2d').drawImage(img, 0, 0, w, h);
 
   if (glTexture) gl.deleteTexture(glTexture);
   glTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, glTexture);
-  // Upload from canvas (always works cross-browser, avoids CORS taint issues)
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, oc);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  if (isPowerOf2(oc.width) && isPowerOf2(oc.height)) {
+  if (isPowerOf2(w) && isPowerOf2(h)) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.generateMipmap(gl.TEXTURE_2D);
   } else {
