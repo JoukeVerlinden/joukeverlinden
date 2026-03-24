@@ -13,7 +13,7 @@ const SITE_CONFIG = {
   siteTitle:    "Humor op de muren",
   siteSubtitle: "Karikaturen op de Antwerpse Academie van schone kunsten",
   panelLabel:   "Details",
-  panelHeading: "Personen en teksten",
+  panelHeading: "Historische Karikaturen en graffiti",
   panelMeta:    "43 gegevens \u00b7 circa 1904 – 1910",
   panoramaFile: "theroom.jpg",   // default panorama loaded on startup
   defaultYaw:   360,               // starting horizontal angle in degrees
