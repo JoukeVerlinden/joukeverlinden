@@ -27,11 +27,9 @@
 
   html {
     height: 100%;
-    height: -webkit-fill-available; /* iOS Safari: fills actual visible area */
   }
   body {
     height: 100%;
-    min-height: -webkit-fill-available;
     width: 100%;
     overflow: hidden;
     background: #0a0805;
@@ -100,6 +98,7 @@
   #app {
     position: fixed;
     top: 52px; bottom: 0; left: 0; right: 0;
+    height: var(--app-height, calc(100vh - 52px));
     display: flex;
   }
 
@@ -725,34 +724,8 @@
 
   /* ── MOBILE ── */
   @media (max-width: 768px) {
-    /* ── iOS Safari URL bar fix ──
-       Make body a flex column so the layout fills exactly the
-       visible viewport. `svh` (small viewport height = with URL bar)
-       ensures nothing is clipped. ── */
-    html {
-      height: -webkit-fill-available;
-      height: 100svh;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-      height: -webkit-fill-available;
-      height: 100svh;
-      overflow: hidden;
-    }
-    #topbar {
-      position: relative;
-      flex-shrink: 0;
-      height: 36px;
-      z-index: 200;
-    }
-    #app {
-      position: relative;
-      flex: 1;
-      flex-direction: column;
-      top: 0;
-      min-height: 0; /* allow flex shrink */
-    }
+    /* Mobile layout */
+    #app { flex-direction: column; top: 36px; bottom: 0; height: var(--app-height, calc(100vh - 36px)); }
     #divider { display: none; }
     #viewer-wrap { height: 60%; flex: none; }
     #side-panel {
@@ -3364,10 +3337,10 @@ function flyTo(p, y) {
 function startAutoTour() {
   autoTour = true;
   document.getElementById('btn-autoplay').textContent = '⏹ Stop';
-  // Resume from the currently active hotspot if one is selected
+  // Start from the annotation AFTER the currently active one
   if (activeId) {
     const idx = HOTSPOTS.findIndex(h => h.id === activeId);
-    if (idx !== -1) autoTourIndex = idx; // runAutoTour will post-increment
+    if (idx !== -1) autoTourIndex = idx + 1;
   }
   runAutoTour();
 }
@@ -3485,9 +3458,16 @@ function init() {
   });
   initGL();
   resizeCanvas();
-  // Re-check after paint — iOS Safari may not have final layout at script time
-  setTimeout(() => { resizeCanvas(); updateHotspots(); }, 200);
-  window.addEventListener('resize', () => { resizeCanvas(); updateHotspots(); });
+  // iOS Safari: update --app-height when URL bar shows/hides
+  function setAppHeight() {
+    const topH = window.innerWidth <= 768 ? 36 : 52;
+    document.documentElement.style.setProperty('--app-height', (window.innerHeight - topH) + 'px');
+    resizeCanvas();
+    updateHotspots();
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+  setTimeout(setAppHeight, 300);
   buildHotspots();
   buildPanel();
   tick();
