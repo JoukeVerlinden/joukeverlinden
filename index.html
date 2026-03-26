@@ -725,7 +725,7 @@
   /* ── MOBILE ── */
   @media (max-width: 768px) {
     /* Mobile layout */
-    #app { flex-direction: column; top: 36px; bottom: 0; height: var(--app-height, calc(100vh - 36px)); }
+    #app { flex-direction: column; top: 36px; bottom: auto; height: var(--app-height, calc(100vh - 36px)); }
     #divider { display: none; }
     #viewer-wrap { height: 60%; flex: none; }
     #side-panel {
@@ -1624,6 +1624,13 @@ body.pick-mode #pick-banner { display: block; }
 <!-- External annotations — loaded first so HOTSPOTS and SITE_CONFIG are available.
      When opened as file:// the browser may block this; the inline fallback below
      ensures the viewer always has data regardless. -->
+<script>
+// Set viewport height immediately so first paint is correct on iOS Safari
+(function() {
+  var topH = window.innerWidth <= 768 ? 36 : 52;
+  document.documentElement.style.setProperty('--app-height', (window.innerHeight - topH) + 'px');
+})();
+</script>
 <script src="annotations.js"></script>
 
 <!-- Inline fallback: only runs if annotations.js failed to load (e.g. file://) -->
