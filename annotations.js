@@ -15,10 +15,20 @@ const SITE_CONFIG = {
   panelLabel:   "Details",
   panelHeading: "Historische Karikaturen en graffiti",
   panelMeta:    "43 gegevens \u00b7 circa 1904 – 1910",
-  panoramaFile: "theroom.jpg",   // default panorama loaded on startup
+  panoramaFile: "theroom1.jpg",  // default panorama loaded on startup
   defaultYaw:   360,               // starting horizontal angle in degrees
   defaultPitch: 0,               // starting vertical angle in degrees
-  defaultZoom:  90               // starting FOV in degrees (20–120)
+  defaultZoom:  90,              // starting FOV in degrees (20–120)
+
+  // ── Time-lapse scenes ─────────────────────────────────
+  // Each entry: { file, year, label }
+  // Hotspots with a numeric `date` field are shown only when
+  // their date year <= the scene year. Undated hotspots always show.
+  scenes: [
+    { file: "theroom1.jpg", year: 1908, label: "ca. 1908" },
+    { file: "theroom2.jpg", year: 2025, label: "ca. 2025" },
+    { file: "theroom3.jpg", year: 2026, label: "2026"     }
+  ]
 };
 
 // ── Annotations ──────────────────────────────────────────
