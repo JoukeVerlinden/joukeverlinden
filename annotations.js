@@ -108,7 +108,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181136312",
         title: "A7",
-        date:  "",
+        date:  "1910",
         pitch: 25.1, yaw: 280.4,
         zoom: 20,
         content: ``,
@@ -116,7 +116,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181155649",
         title: "A8",
-        date:  "",
+        date:  "1910",
         pitch: 18.4, yaw: 283.6,
         zoom: 20,
         content: ``,
@@ -124,7 +124,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181184098",
         title: "A9",
-        date:  "",
+        date:  "1910",
         pitch: 23.8, yaw: 287.8,
         zoom: 20,
         content: ``,
@@ -132,7 +132,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181221015",
         title: "A10",
-        date:  "",
+        date:  "1910",
         pitch: 32.4, yaw: 288.8,
         zoom: 20,
         content: ``,
@@ -140,7 +140,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181251139",
         title: "A11",
-        date:  "",
+        date:  "1910",
         pitch: 26.4, yaw: 295.6,
         zoom: 20,
         content: ``,
@@ -148,7 +148,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181276113",
         title: "A12",
-        date:  "",
+        date:  "1910",
         pitch: 29.6, yaw: 299.4,
         zoom: 20,
         content: ``,
@@ -300,7 +300,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181946871",
         title: "D8",
-        date:  "",
+        date:  "1910",
         pitch: 13.3, yaw: 51,
         zoom: 20,
         content: ``,
@@ -308,7 +308,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181992435",
         title: "D9",
-        date:  "",
+        date:  "1910",
         pitch: 20.1, yaw: 57.2,
         zoom: 35,
         content: ``,
@@ -316,7 +316,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182024041",
         title: "D10",
-        date:  "",
+        date:  "1910",
         pitch: 13.7, yaw: 65.4,
         zoom: 35,
         content: ``,
@@ -324,7 +324,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182075334",
         title: "D11",
-        date:  "",
+        date:  "1910",
         pitch: 20.9, yaw: 74.8,
         zoom: 35,
         content: ``,
@@ -332,7 +332,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182101476",
         title: "D12",
-        date:  "",
+        date:  "1910",
         pitch: 8.5, yaw: 87.6,
         zoom: 20,
         content: ``,
@@ -340,7 +340,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182127538",
         title: "D13",
-        date:  "",
+        date:  "1910",
         pitch: 22.4, yaw: 89.4,
         zoom: 35,
         content: ``,
@@ -348,7 +348,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182164347",
         title: "D14",
-        date:  "",
+        date:  "1910",
         pitch: 20.2, yaw: 108.6,
         zoom: 20,
         content: ``,
@@ -356,7 +356,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182185642",
         title: "D15",
-        date:  "",
+        date:  "1910",
         pitch: 21.7, yaw: 117.2,
         zoom: 20,
         content: ``,
@@ -404,7 +404,7 @@ const HOTSPOTS = [
         type: "inscription",
         id:    "inscription-1774182632829",
         title: "T4",
-        date:  "",
+        date:  "1910",
         corners: [[276.69, 12.78], [296.04, 12.78], [296.04, 9.76], [276.69, 9.76]],
         zoom: 27,
         content: ``,
@@ -417,7 +417,7 @@ const HOTSPOTS = [
         type: "inscription",
         id:    "inscription-1774182685391",
         title: "T4",
-        date:  "",
+        date:  ""1910,
         corners: [[284.25, 9.76], [302.22, 9.76], [302.22, 6.67], [284.25, 6.67]],
         zoom: 25,
         content: ``,
