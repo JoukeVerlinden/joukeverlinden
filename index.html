@@ -2913,11 +2913,11 @@ function loadPanoSrc(src) {
   panoImg.src = src;
 }
 
-// Load default panorama from SITE_CONFIG (use first scene file if scenes are defined)
+// Load default panorama from SITE_CONFIG (use middle scene file if scenes are defined)
 (function() {
   const _cfg = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG : {};
   const _scenes = _cfg.scenes || [];
-  const _src = _scenes.length > 0 ? _scenes[0].file : (_cfg.panoramaFile || 'theroom.jpg');
+  const _src = _scenes.length > 1 ? _scenes[1].file : (_scenes[0] ? _scenes[0].file : (_cfg.panoramaFile || 'theroom.jpg'));
   loadPanoSrc(_src);
 })();
 
@@ -2957,6 +2957,17 @@ function tick() {
     const t = ((performance.now() - homeSwingStart) % HOME_SWING_PERIOD) / HOME_SWING_PERIOD;
     const ease = (1 - Math.cos(t * 2 * Math.PI)) / 2;
     targetYaw = HOME_SWING_YAW_A + ease * (HOME_SWING_YAW_B - HOME_SWING_YAW_A);
+
+    // Detect turn-arounds (t crosses 0→1 boundary = left end, t near 0.5 = right end)
+    // Phase: 0 = moving right (ease rising), 1 = moving left (ease falling)
+    const swingPhase = t < 0.5 ? 0 : 1;
+    if (_lastSwingPhase !== -1 && swingPhase !== _lastSwingPhase) {
+      // Phase flipped → we're at a turn-around point
+      playSwoosh(swingPhase === 0 ? 1 : -1);
+    }
+    _lastSwingPhase = swingPhase;
+  } else {
+    _lastSwingPhase = -1; // reset when swing stops
   }
 
   const prevYaw   = yaw,   prevPitch = pitch;
@@ -3552,10 +3563,11 @@ function init() {
   buildHotspots();
   buildPanel();
   buildEraSwitcher();
-  // Apply initial scene filter after panel is built
+  // Apply initial scene filter (middle scene = index 1) after panel is built
   const _initCfg = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG : {};
   const _initScenes = _initCfg.scenes || [];
-  if (_initScenes.length > 0) applySceneFilter(_initScenes[0].year);
+  const _initScene = _initScenes[1] || _initScenes[0];
+  if (_initScene) applySceneFilter(_initScene.year);
   tick();
   setTimeout(() => {
     document.getElementById('loading').classList.add('fade-out');
@@ -3627,7 +3639,42 @@ function playPing(freq = 880, dur = 0.22) {
   } catch (e) { /* audio not available */ }
 }
 
-// Wire soft pings to existing control buttons
+// A soft airy swoosh — played at the turn-around points of the home swing
+function playSwoosh(direction = 1) {
+  try {
+    const ctx = getAudioCtx();
+    const dur = 0.55;
+    // Noise source
+    const bufLen = Math.floor(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+
+    // Bandpass sweeps from low→high (right turn) or high→low (left turn)
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 1.8;
+    const startF = direction > 0 ? 200 : 900;
+    const endF   = direction > 0 ? 900 : 200;
+    bp.frequency.setValueAtTime(startF, ctx.currentTime);
+    bp.frequency.exponentialRampToValueAtTime(endF, ctx.currentTime + dur);
+
+    // Envelope: quick fade in, longer fade out
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+
+    src.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
+    src.start(); src.stop(ctx.currentTime + dur);
+  } catch (e) { /* audio not available */ }
+}
+
+// Track home-swing turn-around phase to trigger swoosh once per reversal
+let _lastSwingPhase = -1; // -1 = not tracking
 ['btn-zoom-in', 'btn-zoom-out', 'btn-reset-view', 'btn-autoplay', 'btn-toggle-panel']
   .forEach(id => {
     const el = document.getElementById(id);
@@ -3637,7 +3684,7 @@ function playPing(freq = 880, dur = 0.22) {
 // ═══════════════════════════════════════════════════════
 //  ERA / SCENE SWITCHER
 // ═══════════════════════════════════════════════════════
-let currentSceneIndex = 0;
+let currentSceneIndex = 1; // start on the middle scene (theroom2.jpg)
 
 // Parse the year from a hotspot's date string (returns null if no year found)
 function hotspotYear(hs) {
@@ -3720,7 +3767,7 @@ function buildEraSwitcher() {
   const switcher = document.getElementById('era-switcher');
   scenes.forEach((scene, i) => {
     const btn = document.createElement('button');
-    btn.className = 'era-btn' + (i === 0 ? ' active' : '');
+    btn.className = 'era-btn' + (i === 1 ? ' active' : '');  // middle scene active by default
     btn.textContent = scene.label;
     btn.title = 'Toon panorama: ' + scene.label;
     btn.addEventListener('click', () => switchToScene(i));
