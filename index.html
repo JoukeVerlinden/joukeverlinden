@@ -140,6 +140,20 @@ a {
     color: #fff;
   }
 
+  @media (max-width: 768px) {
+    #era-switcher { padding: 2px; gap: 2px; }
+    #era-switcher .era-label { display: none; }
+    .era-btn { font-size: 11px; padding: 4px 9px; letter-spacing: 0; }
+    /* Swap button text to the short mobileLabel on small screens */
+    .era-btn { font-size: 0; }          /* hide original text */
+    .era-btn::before {
+      content: attr(data-mobile);
+      font-size: 11px;
+      font-family: var(--serif);
+      letter-spacing: 0;
+    }
+  }
+
   /* panorama transition flash */
   #pano-transition {
     position: fixed;
@@ -3583,98 +3597,113 @@ function init() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  AUDIO — Web Audio API sound effects
+//  AUDIO — Web Audio API sound effects (mobile-safe)
 // ═══════════════════════════════════════════════════════
 let _audioCtx = null;
+
 function getAudioCtx() {
-  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!_audioCtx) {
+    try {
+      _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) { return null; }
+  }
   return _audioCtx;
+}
+
+// iOS Safari suspends AudioContext until a user gesture.
+// Resume it on the first touch/click anywhere on the page.
+function _resumeAudio() {
+  const ctx = getAudioCtx();
+  if (ctx && ctx.state === 'suspended') ctx.resume();
+}
+document.addEventListener('touchstart', _resumeAudio, { once: true, passive: true });
+document.addEventListener('click',      _resumeAudio, { once: true });
+
+// Guard: only play if context is running (not suspended/closed)
+function _audioReady() {
+  const ctx = getAudioCtx();
+  return ctx && ctx.state === 'running';
 }
 
 // A warm "page turn / shutter" click for era switching
 function playEraClick() {
-  try {
-    const ctx = getAudioCtx();
-    // Quick noise burst simulating a mechanical shutter
-    const bufLen = ctx.sampleRate * 0.18;
-    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufLen; i++) {
-      const env = Math.exp(-i / (bufLen * 0.12));
-      data[i] = (Math.random() * 2 - 1) * env * 0.45;
-    }
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-
-    // Band-pass so it sounds papery, not noisy
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 1200;
-    bp.Q.value = 0.8;
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
-
-    src.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
-    src.start();
-  } catch (e) { /* audio not available */ }
+  // On first era-button tap the context may still be suspended —
+  // resume it, then schedule the sound a tiny tick later.
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const doPlay = () => {
+    try {
+      const bufLen = Math.floor(ctx.sampleRate * 0.18);
+      const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufLen; i++) {
+        const env = Math.exp(-i / (bufLen * 0.12));
+        data[i] = (Math.random() * 2 - 1) * env * 0.45;
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 1200; bp.Q.value = 0.8;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      src.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
+      src.start();
+    } catch (e) { /* silent fail */ }
+  };
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(doPlay);
+  } else {
+    doPlay();
+  }
 }
 
-// A soft gold "ping" for hotspot / button clicks
+// A soft gold "ping" for button clicks
 function playPing(freq = 880, dur = 0.22) {
+  if (!_audioReady()) return;
   try {
-    const ctx = getAudioCtx();
+    const ctx = _audioCtx;
     const osc = ctx.createOscillator();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(freq * 0.6, ctx.currentTime + dur);
-
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.18, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-
     osc.connect(gain); gain.connect(ctx.destination);
     osc.start(); osc.stop(ctx.currentTime + dur);
-  } catch (e) { /* audio not available */ }
+  } catch (e) { /* silent fail */ }
 }
 
 // A soft airy swoosh — played at the turn-around points of the home swing
 function playSwoosh(direction = 1) {
+  if (!_audioReady()) return;
   try {
-    const ctx = getAudioCtx();
+    const ctx = _audioCtx;
     const dur = 0.55;
-    // Noise source
     const bufLen = Math.floor(ctx.sampleRate * dur);
     const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
-
     const src = ctx.createBufferSource();
     src.buffer = buf;
-
-    // Bandpass sweeps from low→high (right turn) or high→low (left turn)
     const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.Q.value = 1.8;
+    bp.type = 'bandpass'; bp.Q.value = 1.8;
     const startF = direction > 0 ? 200 : 900;
     const endF   = direction > 0 ? 900 : 200;
     bp.frequency.setValueAtTime(startF, ctx.currentTime);
     bp.frequency.exponentialRampToValueAtTime(endF, ctx.currentTime + dur);
-
-    // Envelope: quick fade in, longer fade out
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.001, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-
     src.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
     src.start(); src.stop(ctx.currentTime + dur);
-  } catch (e) { /* audio not available */ }
+  } catch (e) { /* silent fail */ }
 }
 
 // Track home-swing turn-around phase to trigger swoosh once per reversal
-let _lastSwingPhase = -1; // -1 = not tracking
+let _lastSwingPhase = -1;
 ['btn-zoom-in', 'btn-zoom-out', 'btn-reset-view', 'btn-autoplay', 'btn-toggle-panel']
   .forEach(id => {
     const el = document.getElementById(id);
@@ -3767,7 +3796,9 @@ function buildEraSwitcher() {
   const switcher = document.getElementById('era-switcher');
   scenes.forEach((scene, i) => {
     const btn = document.createElement('button');
-    btn.className = 'era-btn' + (i === 1 ? ' active' : '');  // middle scene active by default
+    btn.className = 'era-btn' + (i === 1 ? ' active' : '');
+    // Show mobileLabel on small screens via data attribute + CSS content swap
+    btn.dataset.mobile = scene.mobileLabel || scene.label;
     btn.textContent = scene.label;
     btn.title = 'Toon panorama: ' + scene.label;
     btn.addEventListener('click', () => switchToScene(i));
