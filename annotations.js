@@ -71,7 +71,7 @@ const HOTSPOTS = [
         pitch: -4.5, yaw: 262.2,
         zoom: 30,
         content: `uitleg`,
-        links: ["hotspot-1774181854226","hotspot-1774182101476","inscription-1774182579654"],
+        links: ["hotspot-1774181883281"],
       },
       {
         id:    "A3",
@@ -108,7 +108,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181136312",
         title: "A7",
-        date:  "",
+        date:  "1913",
         pitch: 25.1, yaw: 280.4,
         zoom: 20,
         content: ``,
