@@ -19,14 +19,61 @@ const SITE_CONFIG = {
   defaultYaw:   360,               // starting horizontal angle in degrees
   defaultPitch: 0,               // starting vertical angle in degrees
   defaultZoom:  90,              // starting FOV in degrees (20–120)
+  
+  // ── Welcome overlay ───────────────────────────────────
+  // HTML allowed. Shown on startup before the user dismisses.
+  introHTML: `
+    Voor Erfgoeddag 2026 openen we digitaal de deuren van de
+    <strong>Antwerpse Koninklijke Academie van Schone Kunsten</strong>.<br>
+    Een voormalig toilet waar finalisten van de
+    <a href="https://felixarchief.antwerpen.be/nieuwspagina/de-prix-de-rome-een-schatkamer-vol-kunstenaarsgeschiedenis"
+       target="_blank">Prix de Rome</a> (1898–1913)
+    hun karikaturen achterlieten. Een unieke blik op het artistieke leven
+    in Antwerpen rond 1900, met een flinke dosis humor.
+  `,
+
+  // ── Colophon / info panel ─────────────────────────────
+  // Shown when the user clicks the ⓘ button. HTML allowed.
+  colophonTitle: "Over dit project",
+  colophonHTML: `
+    <p>
+      Dit digitale panorama werd ontwikkeld in het kader van
+      <strong>Erfgoeddag 2026</strong> door de
+      <strong>Faculteit Ontwerpwetenschappen, Universiteit Antwerpen</strong>
+      in samenwerking met het <strong>Felixarchief</strong>.
+    </p>
+    <h3>Archief- en dataonderzoek</h3>
+    <p>
+      <strong>Gilles Weyns</strong> — archivistisch onderzoek,
+      transcripties en datering van de karikaturen.<br>
+      <strong>ulrike Müller</strong> — contextonderzoek Prix de Rome
+      en academiegeschiedenis.
+    </p>
+    
+    <h3>Digitale ontwikkeling</h3>
+    <p>
+      <strong>Yiaming Ye</strong> — 3D fotografie en 3D reconstructie.<br>
+      <strong>Jouke Verlinden</strong>Ontwerp en programmering.
+    </p>
+    <h3>Met dank aan</h3>
+    <p>
+      Felixarchief Antwerpen · Stad Antwerpen Erfgoed ·
+      Koninklijke Academie van Schone Kunsten Antwerpen.
+    </p>
+    <p class="colophon-copy">
+      © 2026 UAntwerpen / Felixarchief. Beeldmateriaal en annotaties zijn
+      beschermd door auteursrecht. Gebruik enkel mits schriftelijke
+      toestemming.
+    </p>
+  `,
 
   // ── Time-lapse scenes ─────────────────────────────────
   // Each entry: { file, year, label }
   // Hotspots with a numeric `date` field are shown only when
   // their date year <= the scene year. Undated hotspots always show.
   scenes: [
-    { file: "theroom1.jpg", year: 1908, label: "ca. 1908", mobileLabel: "'1908" },
-    { file: "theroom2.jpg", year: 2025, label: "ca. 2025", mobileLabel: "'2025" },
+    { file: "theroom1.jpg", year: 1908, label: "ca. 1908", mobileLabel: "1908" },
+    { file: "theroom2.jpg", year: 2025, label: "ca. 2025", mobileLabel: "2025" },
     { file: "theroom3.jpg", year: 2026, label: "2026",     mobileLabel: "'26" }
   ]
 };
