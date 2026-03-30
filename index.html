@@ -1033,6 +1033,115 @@ a {
     background: rgba(201,168,76,0.3);
     color: #fff;
   }
+
+  /* ── INFO / COLOPHON BUTTON ── */
+  #btn-info {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold-light);
+    font-size: 15px;
+    line-height: 1;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #btn-info:hover {
+    background: rgba(201,168,76,0.22);
+    border-color: rgba(201,168,76,0.55);
+    color: #fff;
+  }
+
+  /* ── COLOPHON MODAL ── */
+  #colophon-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,3,1,0.72);
+    z-index: 8500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(6px);
+  }
+  #colophon-overlay.open { opacity: 1; pointer-events: all; }
+  #colophon-modal {
+    background: rgba(10,8,5,0.97);
+    border: 1px solid rgba(201,168,76,0.3);
+    max-width: 560px;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #colophon-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    flex-shrink: 0;
+  }
+  #colophon-header h2 {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+  }
+  #colophon-close {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.25);
+    color: rgba(201,168,76,0.7);
+    font-size: 16px;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+  #colophon-close:hover { background: rgba(201,168,76,0.15); color: #fff; }
+  #colophon-body {
+    overflow-y: auto;
+    padding: 22px 28px 28px;
+    font-family: var(--body-serif);
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgba(232,211,176,0.82);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201,168,76,0.2) transparent;
+  }
+  #colophon-body h3 {
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 20px 0 6px;
+  }
+  #colophon-body p { margin-bottom: 10px; }
+  #colophon-body strong { color: var(--parchment); font-weight: 500; }
+  #colophon-body a { color: var(--gold-light); }
+  #colophon-body .colophon-copy {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(201,168,76,0.12);
+    font-size: 11.5px;
+    color: rgba(232,211,176,0.4);
+    font-style: italic;
+  }
+  @media (max-width: 768px) {
+    #colophon-modal { max-height: 90vh; }
+    #btn-info { width: 26px; height: 26px; font-size: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -1065,6 +1174,7 @@ a {
     <input type="file" id="pano-file-input" accept="image/*" style="display:none">
     <button class="ctrl-btn" id="btn-autoplay">⟳ Rondleiding</button>
     <button class="ctrl-btn" id="btn-toggle-panel">Details ◧</button>
+    <button id="btn-info" title="Over dit project">ⓘ</button>
     <button class="ctrl-btn" id="btn-editor" style="border-color:rgba(201,168,76,0.45);color:var(--gold)">✎ Bewerken</button>
   </div>
 </div>
@@ -1115,11 +1225,9 @@ a {
   <div id="start-hint">
     <div id="start-hint-inner">
       <div id="start-hint-welcome"></div>
-         <div class="sh-row">
-      
-        <span class="sh-text">Voor Erfgoeddag 2026 openen we digitaal de deuren van de <strong>Antwerpse Koninklijke Academie van Schone Kunsten</strong>.<br>
-         Een voormalig toilet waar finalisten van de <a href="https://felixarchief.antwerpen.be/nieuwspagina/de-prix-de-rome-een-schatkamer-vol-kunstenaarsgeschiedenis" target="_blank">Prix de Rome</a> (1898–1913) hun karikaturen achterlieten. Een unieke blik op het artistieke leven in Antwerpen rond 1900, met een flinke dosis humor.
-</span>
+      <div class="sh-row">
+        <!-- intro text populated by init() from SITE_CONFIG.introHTML -->
+        <span class="sh-text" id="start-hint-intro"></span>
       </div>
       <div class="sh-row">
         <span class="sh-icon">↔</span>
@@ -3440,13 +3548,28 @@ function flyTo(p, y) {
 // ═══════════════════════════════════════════════════════
 //  AUTO TOUR
 // ═══════════════════════════════════════════════════════
+
+// Returns only the hotspots that are currently visible (era-filtered)
+function visibleHotspots() {
+  const cfg = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG : {};
+  const scenes = cfg.scenes || [];
+  const scene = scenes[currentSceneIndex];
+  if (!scene) return HOTSPOTS; // fallback: show all
+  return HOTSPOTS.filter(hs => hotspotVisibleForYear(hs, scene.year));
+}
+
 function startAutoTour() {
   autoTour = true;
   document.getElementById('btn-autoplay').textContent = '⏹ Stop';
-  // Start from the annotation AFTER the currently active one
+  const pool = visibleHotspots();
+  if (pool.length === 0) { stopAutoTour(); return; }
+  // Start from the annotation AFTER the currently active one within the visible pool
   if (activeId) {
-    const idx = HOTSPOTS.findIndex(h => h.id === activeId);
+    const idx = pool.findIndex(h => h.id === activeId);
     if (idx !== -1) autoTourIndex = idx + 1;
+    else autoTourIndex = 0;
+  } else {
+    autoTourIndex = 0;
   }
   runAutoTour();
 }
@@ -3456,7 +3579,9 @@ function stopAutoTour() {
 }
 function runAutoTour() {
   if (!autoTour) return;
-  setActive(HOTSPOTS[autoTourIndex++ % HOTSPOTS.length].id, true, true);
+  const pool = visibleHotspots();
+  if (pool.length === 0) { stopAutoTour(); return; }
+  setActive(pool[autoTourIndex++ % pool.length].id, true, true);
   autoTourTimer = setTimeout(runAutoTour, 4000);
 }
 document.getElementById('btn-autoplay').addEventListener('click', () =>
@@ -3537,6 +3662,32 @@ function init() {
     // Loading screen title
     const loadingTitle = document.getElementById('loading-title');
     if (loadingTitle) loadingTitle.textContent = firstPart;
+    // Intro text from SITE_CONFIG.introHTML
+    const introEl = document.getElementById('start-hint-intro');
+    if (introEl && cfg.introHTML) introEl.innerHTML = cfg.introHTML;
+    // Colophon title + body from SITE_CONFIG
+    const colTitle = document.getElementById('colophon-title');
+    if (colTitle && cfg.colophonTitle) colTitle.textContent = cfg.colophonTitle;
+    const colBody = document.getElementById('colophon-body');
+    if (colBody && cfg.colophonHTML) colBody.innerHTML = cfg.colophonHTML;
+  }
+
+  // Info / colophon button
+  const btnInfo = document.getElementById('btn-info');
+  const colOverlay = document.getElementById('colophon-overlay');
+  const colClose   = document.getElementById('colophon-close');
+  if (btnInfo && colOverlay) {
+    btnInfo.addEventListener('click', () => {
+      playPing(780, 0.18);
+      colOverlay.classList.add('open');
+    });
+    colClose?.addEventListener('click', () => colOverlay.classList.remove('open'));
+    colOverlay.addEventListener('click', e => {
+      if (e.target === colOverlay) colOverlay.classList.remove('open');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') colOverlay.classList.remove('open');
+    });
   }
 
   // Seed starting view from config defaults
@@ -3808,6 +3959,19 @@ function buildEraSwitcher() {
 
 init();
 </script>
+<!-- Colophon / Info modal -->
+<div id="colophon-overlay">
+  <div id="colophon-modal">
+    <div id="colophon-header">
+      <h2 id="colophon-title">Over dit project</h2>
+      <button id="colophon-close" title="Sluiten">✕</button>
+    </div>
+    <div id="colophon-body">
+      <!-- populated by init() from SITE_CONFIG.colophonHTML -->
+    </div>
+  </div>
+</div>
+
 <!-- Dark flash overlay for panorama transitions -->
 <div id="pano-transition"></div>
 
