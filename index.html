@@ -1427,6 +1427,20 @@ a {
 
 </div>
 
+ <!-- Colophon / Info modal -->
+<div id="colophon-overlay">
+  <div id="colophon-modal">
+    <div id="colophon-header">
+      <h2 id="colophon-title">Over dit project</h2>
+      <button id="colophon-close" title="Sluiten">✕</button>
+    </div>
+    <div id="colophon-body">
+      <!-- populated by init() from SITE_CONFIG.colophonHTML -->
+    </div>
+  </div>
+</div>
+
+
 <style>
 /* ── EDITOR OVERLAY ─────────────────────────────────────── */
 #editor-overlay {
@@ -3944,18 +3958,6 @@ function buildEraSwitcher() {
 init();
 </script>
 
-<!-- Colophon / Info modal -->
-<div id="colophon-overlay">
-  <div id="colophon-modal">
-    <div id="colophon-header">
-      <h2 id="colophon-title">Over dit project</h2>
-      <button id="colophon-close" title="Sluiten">✕</button>
-    </div>
-    <div id="colophon-body">
-      <!-- populated by init() from SITE_CONFIG.colophonHTML -->
-    </div>
-  </div>
-</div>
 
 <script>
 // Wire colophon after its DOM elements exist
