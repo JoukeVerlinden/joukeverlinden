@@ -58,7 +58,8 @@ const SITE_CONFIG = {
     <h3>Met dank aan</h3>
     <p>
       Felixarchief Antwerpen · Stad Antwerpen Erfgoed ·
-      Koninklijke Academie van Schone Kunsten Antwerpen.
+      Koninklijke Academie van Schone Kunsten Antwerpen.<br>
+      bron historische fotos: Dossier betreffende de huldiging van laureaten van de Prix de Rome, Felixarchief Antwerpen, inv. 4414#104
     </p>
     <p class="colophon-copy">
       © 2026 UAntwerpen / Felixarchief. Beeldmateriaal en annotaties zijn
