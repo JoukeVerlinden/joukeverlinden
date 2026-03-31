@@ -46,7 +46,7 @@ const SITE_CONFIG = {
     <p>
       <strong>Gilles Weyns</strong> — archivistisch onderzoek,
       transcripties en datering van de karikaturen.<br>
-      <strong>ulrike Müller</strong> — contextonderzoek Prix de Rome
+      <strong>Ulrike Müller</strong> — contextonderzoek Prix de Rome
       en academiegeschiedenis.
     </p>
     
