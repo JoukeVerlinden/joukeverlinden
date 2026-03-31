@@ -485,7 +485,7 @@ const HOTSPOTS = [
         id:    "T5",
         title: "T5 Vriendelijk verzocht",
         date:  "",
-        corners: [[284.25, 9.76], [302.22, 9.76], [302.22, 6.67], [284.25, 6.67]],
+        corners: [[18.65, 1.54], [45.16, 1.54], [45.16, -0.26], [18.65, -0.26]],
         zoom: 25,
         content: ``,
         transcription: [ "VVriendelijk verzocht deze ignobel menschensmoelen eewig te respecteeren"
