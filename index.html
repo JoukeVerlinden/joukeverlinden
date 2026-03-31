@@ -3672,23 +3672,7 @@ function init() {
     if (colBody && cfg.colophonHTML) colBody.innerHTML = cfg.colophonHTML;
   }
 
-  // Info / colophon button
-  const btnInfo = document.getElementById('btn-info');
-  const colOverlay = document.getElementById('colophon-overlay');
-  const colClose   = document.getElementById('colophon-close');
-  if (btnInfo && colOverlay) {
-    btnInfo.addEventListener('click', () => {
-      playPing(780, 0.18);
-      colOverlay.classList.add('open');
-    });
-    colClose?.addEventListener('click', () => colOverlay.classList.remove('open'));
-    colOverlay.addEventListener('click', e => {
-      if (e.target === colOverlay) colOverlay.classList.remove('open');
-    });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') colOverlay.classList.remove('open');
-    });
-  }
+  // Info / colophon button — wired after DOM is ready (see inline script below modal HTML)
 
   // Seed starting view from config defaults
   const defYaw   = cfg.defaultYaw   ?? 0;
@@ -3959,6 +3943,7 @@ function buildEraSwitcher() {
 
 init();
 </script>
+
 <!-- Colophon / Info modal -->
 <div id="colophon-overlay">
   <div id="colophon-modal">
@@ -3971,6 +3956,27 @@ init();
     </div>
   </div>
 </div>
+
+<script>
+// Wire colophon after its DOM elements exist
+(function() {
+  const btnInfo    = document.getElementById('btn-info');
+  const colOverlay = document.getElementById('colophon-overlay');
+  const colClose   = document.getElementById('colophon-close');
+  if (!btnInfo || !colOverlay) return;
+  btnInfo.addEventListener('click', () => {
+    playPing(780, 0.18);
+    colOverlay.classList.add('open');
+  });
+  colClose.addEventListener('click', () => colOverlay.classList.remove('open'));
+  colOverlay.addEventListener('click', e => {
+    if (e.target === colOverlay) colOverlay.classList.remove('open');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') colOverlay.classList.remove('open');
+  });
+})();
+</script>
 
 <!-- Dark flash overlay for panorama transitions -->
 <div id="pano-transition"></div>
