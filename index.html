@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
-<!-- Unlock ProMotion (120 Hz rAF) on iPhone 13 Pro+ / iPad Pro in Safari iOS 15.4+ -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Heritage 360° Viewer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3105,8 +3102,7 @@ document.addEventListener('visibilitychange', () => {
   } else {
     // Hidden: cancel any pending tick
     if (_rafId !== null) {
-      if (canvas.cancelVideoFrameCallback) canvas.cancelVideoFrameCallback(_rafId);
-      else cancelAnimationFrame(_rafId);
+      cancelAnimationFrame(_rafId);
       _rafId = null;
     }
     if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
@@ -3119,22 +3115,15 @@ function scheduleTick(immediate) {
   if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
   if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
 
-  // Always use requestVideoFrameCallback when available — on both macOS and iOS Safari
-  // this is what keeps the canvas classified as "actively rendering" so Safari maintains
-  // its ProMotion / high-refresh-rate lock. Falling back to rAF breaks the chain and
-  // causes Safari to re-lock to 60 Hz until it sees sustained rVFC draws again.
-  const scheduleHigh = cb => canvas.requestVideoFrameCallback
-    ? canvas.requestVideoFrameCallback(cb)
-    : requestAnimationFrame(cb);
-
   if (immediate || _idleFrames < IDLE_AFTER) {
-    _rafId = scheduleHigh(tick);
+    _rafId = requestAnimationFrame(tick);
   } else {
-    // Idle: wait ~100 ms then fire via rVFC (not plain rAF) so the chain stays intact
+    // Idle: throttle to ~10 fps. Force one real draw on wake so
+    // the view doesn't stay stale after a long idle period.
     _idleTimer = setTimeout(() => {
       _idleTimer = null;
-      panoDirty = true; // force one real draw so Safari sees activity on wake
-      _rafId = scheduleHigh(tick);
+      panoDirty = true;
+      _rafId = requestAnimationFrame(tick);
     }, IDLE_INTERVAL);
   }
 }
