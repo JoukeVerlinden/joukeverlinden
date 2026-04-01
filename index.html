@@ -258,6 +258,10 @@ a {
   }
   .hotspot-ring:nth-child(2) { animation-delay: 0.8s; }
   .hotspot-ring:nth-child(3) { animation-delay: 1.6s; }
+  /* Pause ring animations when hotspot is not on screen — saves ~90 simultaneous CSS animations */
+  .hotspot.cluster-hidden .hotspot-ring,
+  .hotspot.year-hidden .hotspot-ring,
+  .hotspot.rings-paused .hotspot-ring { animation-play-state: paused; }
 
   @keyframes pulse-ring {
     0%   { transform: scale(0.6); opacity: 0.9; }
@@ -366,6 +370,9 @@ a {
     stroke-dasharray: none;
     animation: none;
   }
+  /* Pause march-dashes when inscription is off-screen or year-hidden */
+  .rect-hotspot-group.year-hidden .rect-border,
+  .rect-hotspot-group.anim-paused .rect-border { animation-play-state: paused; }
 
   @keyframes march-dashes {
     to { stroke-dashoffset: -40; }
@@ -3039,62 +3046,124 @@ function drawPanorama() {
 // ═══════════════════════════════════════════════════════
 //  ANIMATION LOOP
 // ═══════════════════════════════════════════════════════
+
+// Idle throttle — after the view settles we drop from 60 fps to ~10 fps
+let _idleFrames   = 0;          // frames since last movement
+const IDLE_AFTER  = 60;         // frames of stillness before throttling (~1 s)
+const IDLE_INTERVAL = 100;      // ms between ticks when idle (~10 fps)
+let _idleTimer    = null;       // setTimeout handle when throttled
+let _rafId        = null;       // current rAF handle
+
+// Cached DOM values — only write when changed (fix: DOM writes every frame)
+let _lastZoomRound = -1, _lastBtnInDis = null, _lastBtnOutDis = null;
+
+// ── Page Visibility — pause everything when tab is hidden ──────────────────
+let _pageVisible = !document.hidden;
+document.addEventListener('visibilitychange', () => {
+  _pageVisible = !document.hidden;
+  if (_pageVisible) {
+    // Resuming: if swing was active, re-anchor its start time so it
+    // continues from the same position rather than jumping.
+    if (homeSwing) homeSwingStart = performance.now() - (homeSwingStart || 0);
+    _idleFrames = 0;
+    scheduleTick(true);           // restart rAF loop
+  } else {
+    // Hidden: cancel any pending tick — browser may throttle rAF anyway
+    // but we cancel explicitly to stop JS work and CSS animations too.
+    if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
+    if (_idleTimer) { clearTimeout(_idleTimer);     _idleTimer = null; }
+    // Pause CSS animations globally while hidden
+    document.body.style.animationPlayState = 'paused';
+  }
+});
+
+function scheduleTick(immediate) {
+  if (!_pageVisible) return;                // tab hidden — do nothing
+  if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
+  if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
+  if (immediate || _idleFrames < IDLE_AFTER) {
+    // Active: run at display refresh rate
+    _rafId = requestAnimationFrame(tick);
+  } else {
+    // Idle: run at ~10 fps to keep easing math ticking over
+    _idleTimer = setTimeout(() => { _idleTimer = null; _rafId = requestAnimationFrame(tick); }, IDLE_INTERVAL);
+  }
+}
+
 function tick() {
+  _rafId = null;
+
+  // Restore CSS animations if page just became visible (body may still be paused)
+  if (document.body.style.animationPlayState === 'paused') {
+    document.body.style.animationPlayState = '';
+  }
+
   // Home swing — ease-in-out oscillation between HOME_SWING_YAW_A and B
   if (homeSwing) {
     const t = ((performance.now() - homeSwingStart) % HOME_SWING_PERIOD) / HOME_SWING_PERIOD;
     const ease = (1 - Math.cos(t * 2 * Math.PI)) / 2;
     targetYaw = HOME_SWING_YAW_A + ease * (HOME_SWING_YAW_B - HOME_SWING_YAW_A);
 
-    // Detect turn-arounds (t crosses 0→1 boundary = left end, t near 0.5 = right end)
-    // Phase: 0 = moving right (ease rising), 1 = moving left (ease falling)
     const swingPhase = t < 0.5 ? 0 : 1;
     if (_lastSwingPhase !== -1 && swingPhase !== _lastSwingPhase) {
-      // Phase flipped → we're at a turn-around point
       playSwoosh(swingPhase === 0 ? 1 : -1);
     }
     _lastSwingPhase = swingPhase;
   } else {
-    _lastSwingPhase = -1; // reset when swing stops
+    _lastSwingPhase = -1;
   }
 
-  const prevYaw   = yaw,   prevPitch = pitch;
-  const prevFovH  = fovH;
+  const prevYaw  = yaw,  prevPitch = pitch;
+  const prevFovH = fovH;
 
-  fovH        += (targetFovH   - fovH)   * 0.1;
+  fovH        += (targetFovH  - fovH)   * 0.1;
   targetPitch  = clampPitch(targetPitch);
-  yaw         += (targetYaw   - yaw)    * 0.08;
-  pitch       += (targetPitch - pitch)  * 0.08;
+  yaw         += (targetYaw  - yaw)    * 0.08;
+  pitch       += (targetPitch - pitch) * 0.08;
   pitch        = clampPitch(pitch);
 
-  // Skip GPU draw when view has converged — saves mobile battery
   const moving = homeSwing
     || panoDirty
-    || Math.abs(yaw - prevYaw) > 0.005
+    || Math.abs(yaw  - prevYaw)   > 0.005
     || Math.abs(pitch - prevPitch) > 0.005
-    || Math.abs(fovH - prevFovH) > 0.05;
+    || Math.abs(fovH  - prevFovH)  > 0.05;
   panoDirty = false;
 
-  const zoomLabel = document.getElementById('zoom-indicator');
-  if (zoomLabel) zoomLabel.textContent = Math.round(fovH) + '°';
-  const btnIn  = document.getElementById('btn-zoom-in');
-  const btnOut = document.getElementById('btn-zoom-out');
-  if (btnIn)  btnIn.disabled  = targetFovH <= FOV_MIN;
-  if (btnOut) btnOut.disabled = targetFovH >= FOV_MAX;
+  // Fix: only write to DOM when value actually changed
+  const zoomRound = Math.round(fovH);
+  if (zoomRound !== _lastZoomRound) {
+    const zoomLabel = document.getElementById('zoom-indicator');
+    if (zoomLabel) zoomLabel.textContent = zoomRound + '°';
+    _lastZoomRound = zoomRound;
+  }
+  const wantInDis  = targetFovH <= FOV_MIN;
+  const wantOutDis = targetFovH >= FOV_MAX;
+  if (wantInDis !== _lastBtnInDis) {
+    const btnIn = document.getElementById('btn-zoom-in');
+    if (btnIn) btnIn.disabled = wantInDis;
+    _lastBtnInDis = wantInDis;
+  }
+  if (wantOutDis !== _lastBtnOutDis) {
+    const btnOut = document.getElementById('btn-zoom-out');
+    if (btnOut) btnOut.disabled = wantOutDis;
+    _lastBtnOutDis = wantOutDis;
+  }
 
   if (moving) {
+    _idleFrames = 0;
     drawPanorama();
     updateHotspots();
 
-    // Scale inscription rect stroke width with FOV
     const rectSvg = document.getElementById('rect-svg');
     if (rectSvg) {
       const rectStroke = Math.max(0.6, Math.min(1.5, (120 - fovH) / (120 - 20) * 0.9 + 0.6));
       rectSvg.style.setProperty('--rect-stroke', rectStroke);
     }
+  } else {
+    _idleFrames++;
   }
 
-  requestAnimationFrame(tick);
+  scheduleTick(moving); // immediate if still moving, throttled if idle
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3115,6 +3184,7 @@ canvas.addEventListener('mousedown', e => {
   homeSwing = false;
   if (pickMode) return;
   isDragging = true; lastX = e.clientX; lastY = e.clientY;
+  _idleFrames = 0; scheduleTick(true);
 });
 window.addEventListener('mousemove', e => {
   if (!isDragging) return;
@@ -3130,6 +3200,7 @@ canvas.addEventListener('touchstart', e => {
     isDragging = true;
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
   }
+  _idleFrames = 0; scheduleTick(true);
 }, { passive: true });
 canvas.addEventListener('touchmove', e => {
   if (isDragging && e.touches.length === 1) {
@@ -3165,11 +3236,13 @@ canvas.addEventListener('wheel', e => {
   homeSwing = false;
   e.preventDefault();
   targetFovH = Math.max(FOV_MIN, Math.min(FOV_MAX, targetFovH + (e.deltaY > 0 ? 6 : -6)));
+  _idleFrames = 0; scheduleTick(true);
 }, { passive: false });
 
 window.addEventListener('keydown', e => {
   if (e.key === '+' || e.key === '=') targetFovH = Math.max(FOV_MIN, targetFovH - 10);
   if (e.key === '-' || e.key === '_') targetFovH = Math.min(FOV_MAX, targetFovH + 10);
+  _idleFrames = 0; scheduleTick(true);
 });
 //  Uses the exact same 3-D rotation as the GLSL shader.
 //  Returns { x, y, behind } in CSS canvas pixels.
@@ -3209,12 +3282,13 @@ function updateHotspots() {
       if (!g) return;
       const pts = hs.corners.map(([cy, cp]) => projectPoint(cy, cp));
       const anyBehind = pts.some(p => p.behind);
-      if (anyBehind || g.classList.contains('year-hidden')) { g.style.display = 'none'; return; }
+      if (anyBehind || g.classList.contains('year-hidden')) { g.style.display = 'none'; g.classList.add('anim-paused'); return; }
       g.style.display = '';
       const margin = Math.max(W, H) * 2;
       if (pts.some(p => p.x < -margin || p.x > W + margin || p.y < -margin || p.y > H + margin)) {
-        g.style.display = 'none'; return;
+        g.style.display = 'none'; g.classList.add('anim-paused'); return;
       }
+      g.classList.remove('anim-paused');
       const pointsAttr = pts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
       g.querySelector('.rect-fill').setAttribute('points', pointsAttr);
       g.querySelector('.rect-border').setAttribute('points', pointsAttr);
@@ -3254,6 +3328,8 @@ function updateHotspots() {
       el.style.top  = py + 'px';
       el.style.opacity       = visible ? '1' : '0';
       el.style.pointerEvents = visible ? 'all' : 'none';
+      // Pause pulse-ring CSS animations when hotspot is invisible — saves ~90 animations
+      el.classList.toggle('rings-paused', !visible);
       el._screenX = x; el._screenY = py; el._onScreen = visible;
     }
   });
@@ -3721,7 +3797,7 @@ function init() {
   const _initScenes = _initCfg.scenes || [];
   const _initScene = _initScenes[1] || _initScenes[0];
   if (_initScene) applySceneFilter(_initScene.year);
-  tick();
+  scheduleTick(true);
   setTimeout(() => {
     document.getElementById('loading').classList.add('fade-out');
     setTimeout(() => document.getElementById('loading').remove(), 900);
