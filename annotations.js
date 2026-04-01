@@ -284,6 +284,7 @@ const HOTSPOTS = [
         id:    "B2",
         title: "B2 Walter Vaes?",
         date:  "",
+        image: "images/1910_Foto_Watteyne_Brugge.jpg",
         pitch: -8.5, yaw: 310.2,
         zoom: 20,
         content: ``,
@@ -300,6 +301,7 @@ const HOTSPOTS = [
         id:    "B4",
         title: "B4 Vaes-Lamber-Dom-Steel?",
         date:  "",
+        image: "images/LeoSteel_zelfportret.jpg",
         pitch: 9.1, yaw: 310.2,
         zoom: 30,
         content: ``,
@@ -368,6 +370,7 @@ const HOTSPOTS = [
         corners: [[18.65, 1.54], [45.16, 1.54], [45.16, -0.26], [18.65, -0.26]],
         zoom: 25,
         content: ``,
+        image: "images/Foto_en_loge_1901_deelnemers_Prix_de_Rome_privéarchief.jpg",
         transcription: [ "Vriendelijk verzocht deze ignobel menschensmoelen eewig te respecteeren"
 
         ],
