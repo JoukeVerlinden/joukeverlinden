@@ -1034,6 +1034,66 @@ a {
     color: #fff;
   }
 
+  /* ── START-HINT TABS ── */
+  #sh-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid rgba(201,168,76,0.18);
+    margin: 4px 0 10px;
+  }
+  .sh-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgba(201,168,76,0.5);
+    font-family: var(--accent-serif);
+    font-style: italic;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 16px 6px;
+    cursor: pointer;
+    transition: color 0.18s, border-color 0.18s;
+    margin-bottom: -1px;
+  }
+  .sh-tab:hover { color: var(--gold-light); }
+  .sh-tab.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold);
+  }
+  .sh-tab-panel { display: flex; flex-direction: column; gap: 11px; }
+  #sh-colophon-body {
+    font-family: var(--body-serif);
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(232,211,176,0.82);
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201,168,76,0.2) transparent;
+    padding-right: 4px;
+  }
+  #sh-colophon-body h3 {
+    font-family: var(--serif);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 14px 0 4px;
+  }
+  #sh-colophon-body p { margin-bottom: 8px; }
+  #sh-colophon-body strong { color: var(--parchment); font-weight: 500; }
+  #sh-colophon-body a { color: var(--gold-light); }
+  #sh-colophon-body .colophon-copy {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(201,168,76,0.12);
+    font-size: 11px;
+    color: rgba(232,211,176,0.4);
+    font-style: italic;
+  }
+
   /* ── INFO / COLOPHON BUTTON ── */
   #btn-info {
     background: rgba(201,168,76,0.08);
@@ -1221,34 +1281,53 @@ a {
     </svg>
   </div>
 
-  <!-- Startup hint overlay -->
+  <!-- Startup hint overlay — combined welcome + colophon -->
   <div id="start-hint">
     <div id="start-hint-inner">
       <div id="start-hint-welcome"></div>
-      <div class="sh-row">
-        <!-- intro text populated by init() from SITE_CONFIG.introHTML -->
-        <span class="sh-text" id="start-hint-intro"></span>
+
+      <!-- Tab bar -->
+      <div id="sh-tabs">
+        <button class="sh-tab active" data-tab="info">Welkom</button>
+        <button class="sh-tab" data-tab="colophon">Colofon</button>
       </div>
-      <div class="sh-row">
-        <span class="sh-icon">↔</span>
-        <span class="sh-text"><strong>Verkennen</strong> — sleep het beeld om rond te kijken</span>
+
+      <!-- Tab: Welcome / intro -->
+      <div class="sh-tab-panel" id="sh-panel-info">
+        <div class="sh-row">
+          <span class="sh-text" id="start-hint-intro"></span>
+        </div>
+        <div class="sh-row">
+          <span class="sh-icon">↔</span>
+          <span class="sh-text"><strong>Verkennen</strong> — sleep het beeld om rond te kijken</span>
+        </div>
+        <div class="sh-row">
+          <span class="sh-icon">⊕</span>
+          <span class="sh-text"><strong>Inzoomen</strong> — scroll of gebruik <kbd>+</kbd> / <kbd>−</kbd> om markeringen zichtbaar te maken<span class="mobile-only"> · knijp met twee vingers</span></span>
+        </div>
+        <div class="sh-row">
+          <span class="sh-icon">◷</span>
+          <span class="sh-text"><strong>Tijdvak</strong> — gebruik de knoppen bovenaan om te wisselen tussen verschillende periodes; enkel de markeringen uit die tijd worden getoond</span>
+        </div>
+        <div class="sh-row">
+          <span class="sh-icon">⌂</span>
+          <span class="sh-text"><strong>Beginpositie</strong> — klik het huis-icoon rechtsonder om terug te keren</span>
+        </div>
+        <div class="sh-row">
+          <span class="sh-icon">⟳</span>
+          <span class="sh-text"><strong>Rondleiding</strong> — klik <em>Rondleiding</em> bovenaan voor een automatische tour</span>
+        </div>
+        <div class="sh-row mobile-only">
+          <span class="sh-icon">☰</span>
+          <span class="sh-text"><strong>Annotaties</strong> — zie informatie per markering in het paneel onderaan</span>
+        </div>
       </div>
-      <div class="sh-row">
-        <span class="sh-icon">⊕</span>
-        <span class="sh-text"><strong>Inzoomen</strong> — scroll of gebruik <kbd>+</kbd> / <kbd>−</kbd> om markeringen zichtbaar te maken<span class="mobile-only"> · knijp met twee vingers</span></span>
+
+      <!-- Tab: Colophon -->
+      <div class="sh-tab-panel" id="sh-panel-colophon" style="display:none">
+        <div id="sh-colophon-body"></div>
       </div>
-      <div class="sh-row">
-        <span class="sh-icon">⌂</span>
-        <span class="sh-text"><strong>Beginpositie</strong> — klik het huis-icoon rechtsonder om terug te keren</span>
-      </div>
-      <div class="sh-row">
-        <span class="sh-icon">⟳</span>
-        <span class="sh-text"><strong>Rondleiding</strong> — klik <em>Rondleiding</em> bovenaan voor een automatische tour</span>
-      </div>
-      <div class="sh-row mobile-only">
-        <span class="sh-icon">☰</span>
-        <span class="sh-text"><strong>Annotaties</strong> — zie informatie per markering in het paneel onderaan</span>
-      </div>
+
       <button id="start-hint-close">Begrepen</button>
     </div>
   </div>
@@ -1427,7 +1506,9 @@ a {
 
 </div>
 
- <!-- Colophon / Info modal -->
+<!-- ═══════════════════════════════════════════════════════
+     COLOPHON / INFO MODAL
+════════════════════════════════════════════════════════ -->
 <div id="colophon-overlay">
   <div id="colophon-modal">
     <div id="colophon-header">
@@ -1440,6 +1521,8 @@ a {
   </div>
 </div>
 
+<!-- Dark flash overlay for panorama transitions -->
+<div id="pano-transition"></div>
 
 <style>
 /* ── EDITOR OVERLAY ─────────────────────────────────────── */
@@ -3036,6 +3119,7 @@ function drawFallback() {
 
 // ── Panorama image load ──────────────────────────────
 let panoReady = false;
+let panoDirty = false; // set true after loadPanoSrc to force one redraw even when view is static
 const panoImg = new Image();
 
 function loadPanoSrc(src) {
@@ -3043,6 +3127,7 @@ function loadPanoSrc(src) {
   panoImg.onload = () => {
     uploadTexture(panoImg);
     panoReady = true;
+    panoDirty = true; // force at least one redraw even if view hasn't moved
   };
   panoImg.onerror = () => console.warn('Panorama image failed to load.');
   // Do NOT set crossOrigin for local/same-origin files — causes CORS failure
@@ -3117,9 +3202,11 @@ function tick() {
 
   // Skip GPU draw when view has converged — saves mobile battery
   const moving = homeSwing
+    || panoDirty
     || Math.abs(yaw - prevYaw) > 0.005
     || Math.abs(pitch - prevPitch) > 0.005
     || Math.abs(fovH - prevFovH) > 0.05;
+  panoDirty = false;
 
   const zoomLabel = document.getElementById('zoom-indicator');
   if (zoomLabel) zoomLabel.textContent = Math.round(fovH) + '°';
@@ -3439,7 +3526,7 @@ function buildPanel() {
       inscriptionHTML =
         '<div class="inscription-block">' +
         (hs.image ? '<img class="inscription-bitmap" src="' + hs.image + '" alt="Inscription photograph" loading="lazy">' : '') +
-        '<div class="inscription-label">Transcriptie · Latijnse tekst</div>' +
+        '<div class="inscription-label">Transcriptie</div>' +
         '<div class="inscription-transcription">' + lines + '</div>' +
         translationHTML +
         '</div>';
@@ -3679,14 +3766,43 @@ function init() {
     // Intro text from SITE_CONFIG.introHTML
     const introEl = document.getElementById('start-hint-intro');
     if (introEl && cfg.introHTML) introEl.innerHTML = cfg.introHTML;
-    // Colophon title + body from SITE_CONFIG
+    // Colophon title + body — standalone modal
     const colTitle = document.getElementById('colophon-title');
     if (colTitle && cfg.colophonTitle) colTitle.textContent = cfg.colophonTitle;
     const colBody = document.getElementById('colophon-body');
     if (colBody && cfg.colophonHTML) colBody.innerHTML = cfg.colophonHTML;
+    // Colophon body — welcome overlay tab
+    const shColBody = document.getElementById('sh-colophon-body');
+    if (shColBody && cfg.colophonHTML) shColBody.innerHTML = cfg.colophonHTML;
   }
 
-  // Info / colophon button — wired after DOM is ready (see inline script below modal HTML)
+  // Welcome overlay tab switching
+  document.querySelectorAll('.sh-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.sh-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sh-tab-panel').forEach(p => p.style.display = 'none');
+      tab.classList.add('active');
+      document.getElementById('sh-panel-' + tab.dataset.tab).style.display = 'flex';
+    });
+  });
+
+  // Info / colophon button
+  const btnInfo = document.getElementById('btn-info');
+  const colOverlay = document.getElementById('colophon-overlay');
+  const colClose   = document.getElementById('colophon-close');
+  if (btnInfo && colOverlay) {
+    btnInfo.addEventListener('click', () => {
+      playPing(780, 0.18);
+      colOverlay.classList.add('open');
+    });
+    colClose.addEventListener('click', () => colOverlay.classList.remove('open'));
+    colOverlay.addEventListener('click', e => {
+      if (e.target === colOverlay) colOverlay.classList.remove('open');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') colOverlay.classList.remove('open');
+    });
+  }
 
   // Seed starting view from config defaults
   const defYaw   = cfg.defaultYaw   ?? 0;
@@ -3957,31 +4073,6 @@ function buildEraSwitcher() {
 
 init();
 </script>
-
-
-<script>
-// Wire colophon after its DOM elements exist
-(function() {
-  const btnInfo    = document.getElementById('btn-info');
-  const colOverlay = document.getElementById('colophon-overlay');
-  const colClose   = document.getElementById('colophon-close');
-  if (!btnInfo || !colOverlay) return;
-  btnInfo.addEventListener('click', () => {
-    playPing(780, 0.18);
-    colOverlay.classList.add('open');
-  });
-  colClose.addEventListener('click', () => colOverlay.classList.remove('open'));
-  colOverlay.addEventListener('click', e => {
-    if (e.target === colOverlay) colOverlay.classList.remove('open');
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') colOverlay.classList.remove('open');
-  });
-})();
-</script>
-
-<!-- Dark flash overlay for panorama transitions -->
-<div id="pano-transition"></div>
 
 </body>
 </html>
