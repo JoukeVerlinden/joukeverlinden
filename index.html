@@ -182,8 +182,6 @@ a {
     min-width: 0;
     background: #000;
     overflow: hidden;
-    /* Promote to its own compositor layer — avoids re-painting the panel on every frame */
-    contain: strict;
   }
 
   #panorama-canvas {
@@ -193,8 +191,6 @@ a {
     cursor: grab;
     user-select: none;
     touch-action: none;
-    /* Tell the GPU this element's transform changes every frame */
-    will-change: transform;
   }
   #panorama-canvas:active { cursor: grabbing; }
 
@@ -211,8 +207,6 @@ a {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    /* Hotspot positions update every frame — own compositor layer */
-    will-change: contents;
   }
 
   .hotspot {
@@ -573,21 +567,6 @@ a {
     text-align: center;
   }
 
-  #fps-indicator {
-    font-family: var(--accent-serif);
-    font-style: italic;
-    font-size: 9px;
-    letter-spacing: 0.04em;
-    padding: 2px 0 4px;
-    width: 36px;
-    text-align: center;
-    color: rgba(201,168,76,0.45);
-    transition: color 0.4s;
-  }
-  #fps-indicator.fps-good   { color: rgba(100,200,100,0.7); }
-  #fps-indicator.fps-ok     { color: rgba(201,168,76,0.7);  }
-  #fps-indicator.fps-low    { color: rgba(220,100,60,0.85); }
-
   /* ── SIDE PANEL ── */
   #side-panel {
     width: 380px;
@@ -651,9 +630,6 @@ a {
     padding: 0;
     scrollbar-width: thin;
     scrollbar-color: rgba(201,168,76,0.2) transparent;
-    /* iOS momentum scrolling */
-    -webkit-overflow-scrolling: touch;
-    will-change: scroll-position;
   }
 
   #annotation-list::-webkit-scrollbar { width: 4px; }
@@ -1202,8 +1178,6 @@ a {
       <button class="vc-btn" id="btn-zoom-in"  title="Inzoomen">+</button>
       <div id="zoom-indicator">90°</div>
       <button class="vc-btn" id="btn-zoom-out" title="Uitzoomen">−</button>
-      <div class="vc-divider"></div>
-      <div id="fps-indicator" title="Frames per second">—</div>
     </div>
 
     <!-- Pick mode ghost overlay -->
@@ -3044,12 +3018,10 @@ function loadPanoSrc(src) {
 
 // ── Canvas resize ────────────────────────────────────
 function resizeCanvas() {
-  // Cap DPR at 1.5 on iOS (high-DPR iPhones push 3×, which triples GPU fragment work)
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const dpr = Math.min(window.devicePixelRatio || 1, isIOS ? 1.5 : 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = canvas.offsetWidth;
   const h = canvas.offsetHeight;
-  if (!w || !h) return;
+  if (!w || !h) return; // skip if not yet laid out — prevents stretching
   canvas.width  = w * dpr;
   canvas.height = h * dpr;
   if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
@@ -3085,10 +3057,6 @@ let _rafId        = null;       // current rAF handle
 // Cached DOM values — only write when changed (fix: DOM writes every frame)
 let _lastZoomRound = -1, _lastBtnInDis = null, _lastBtnOutDis = null;
 
-// FPS measurement — rolling average over last 30 frames
-let _fpsTimes = [];
-let _lastFpsDisplay = -1;
-
 // ── Page Visibility — pause everything when tab is hidden ──────────────────
 let _pageVisible = !document.hidden;
 document.addEventListener('visibilitychange', () => {
@@ -3100,20 +3068,11 @@ document.addEventListener('visibilitychange', () => {
     _idleFrames = 0;
     scheduleTick(true);           // restart rAF loop
   } else {
-<<<<<<< HEAD
-    // Hidden: cancel any pending tick
-    if (_rafId !== null) {
-      cancelAnimationFrame(_rafId);
-      _rafId = null;
-    }
-    if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
-=======
     // Hidden: cancel any pending tick — browser may throttle rAF anyway
     // but we cancel explicitly to stop JS work and CSS animations too.
     if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
     if (_idleTimer) { clearTimeout(_idleTimer);     _idleTimer = null; }
     // Pause CSS animations globally while hidden
->>>>>>> parent of a7f7606 (Update index.html)
     document.body.style.animationPlayState = 'paused';
   }
 });
@@ -3122,46 +3081,17 @@ function scheduleTick(immediate) {
   if (!_pageVisible) return;                // tab hidden — do nothing
   if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
   if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
-
   if (immediate || _idleFrames < IDLE_AFTER) {
-<<<<<<< HEAD
-    _rafId = requestAnimationFrame(tick);
-  } else {
-    // Idle: throttle to ~10 fps. Force one real draw on wake so
-    // the view doesn't stay stale after a long idle period.
-    _idleTimer = setTimeout(() => {
-      _idleTimer = null;
-      panoDirty = true;
-      _rafId = requestAnimationFrame(tick);
-    }, IDLE_INTERVAL);
-=======
     // Active: run at display refresh rate
     _rafId = requestAnimationFrame(tick);
   } else {
     // Idle: run at ~10 fps to keep easing math ticking over
     _idleTimer = setTimeout(() => { _idleTimer = null; _rafId = requestAnimationFrame(tick); }, IDLE_INTERVAL);
->>>>>>> parent of a7f7606 (Update index.html)
   }
 }
 
 function tick() {
   _rafId = null;
-
-  // ── FPS measurement ──────────────────────────────────
-  const _now = performance.now();
-  _fpsTimes.push(_now);
-  if (_fpsTimes.length > 30) _fpsTimes.shift();
-  if (_fpsTimes.length >= 2) {
-    const fps = Math.round((_fpsTimes.length - 1) / (_now - _fpsTimes[0]) * 1000);
-    if (fps !== _lastFpsDisplay) {
-      _lastFpsDisplay = fps;
-      const el = document.getElementById('fps-indicator');
-      if (el) {
-        el.textContent = fps + ' fps';
-        el.className = fps >= 55 ? 'fps-good' : fps >= 30 ? 'fps-ok' : 'fps-low';
-      }
-    }
-  }
 
   // Restore CSS animations if page just became visible (body may still be paused)
   if (document.body.style.animationPlayState === 'paused') {
@@ -3837,8 +3767,6 @@ function init() {
     const c = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG : {};
     flyTo(c.defaultPitch ?? 0, c.defaultYaw ?? 0);
     targetFovH = Math.max(FOV_MIN, Math.min(FOV_MAX, c.defaultZoom ?? 90));
-    // Stop rondleiding if running
-    if (autoTour) stopAutoTour();
     // Deselect active hotspot
     activeId = null;
     document.querySelectorAll('.hotspot, .rect-hotspot-group, .annotation-entry')
