@@ -3207,7 +3207,7 @@ function updateHotspots() {
       if (!g) return;
       const pts = hs.corners.map(([cy, cp]) => projectPoint(cy, cp));
       const anyBehind = pts.some(p => p.behind);
-      if (anyBehind) { g.style.display = 'none'; return; }
+      if (anyBehind || g.classList.contains('year-hidden')) { g.style.display = 'none'; return; }
       g.style.display = '';
       const margin = Math.max(W, H) * 2;
       if (pts.some(p => p.x < -margin || p.x > W + margin || p.y < -margin || p.y > H + margin)) {
@@ -3873,7 +3873,11 @@ function applySceneFilter(sceneYear) {
     const el = document.getElementById('hs-' + hs.id);
     if (!el) return;
     const visible = hotspotVisibleForYear(hs, sceneYear);
-    el.style.display = visible ? '' : 'none';
+    // Use a class so updateHotspots() can respect it for inscriptions
+    el.classList.toggle('year-hidden', !visible);
+    if (hs.type !== 'inscription') {
+      el.style.display = visible ? '' : 'none';
+    }
   });
 
   // Rebuild panel with filtered entries
