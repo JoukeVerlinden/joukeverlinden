@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+<!-- Unlock ProMotion (120 Hz rAF) on iPhone 13 Pro+ / iPad Pro in Safari iOS 15.4+ -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Heritage 360° Viewer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3100,24 +3103,32 @@ document.addEventListener('visibilitychange', () => {
     _idleFrames = 0;
     scheduleTick(true);           // restart rAF loop
   } else {
-    // Hidden: cancel any pending tick — browser may throttle rAF anyway
-    // but we cancel explicitly to stop JS work and CSS animations too.
-    if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
-    if (_idleTimer) { clearTimeout(_idleTimer);     _idleTimer = null; }
-    // Pause CSS animations globally while hidden
+    // Hidden: cancel any pending tick
+    if (_rafId !== null) {
+      if (canvas.cancelVideoFrameCallback) canvas.cancelVideoFrameCallback(_rafId);
+      cancelAnimationFrame(_rafId); // safe to call even if it was an rVFC id
+      _rafId = null;
+    }
+    if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
     document.body.style.animationPlayState = 'paused';
   }
 });
 
 function scheduleTick(immediate) {
-  if (!_pageVisible) return;                // tab hidden — do nothing
+  if (!_pageVisible) return;
   if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
   if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
   if (immediate || _idleFrames < IDLE_AFTER) {
-    // Active: run at display refresh rate
-    _rafId = requestAnimationFrame(tick);
+    // Use requestVideoFrameCallback when available — this is the path Safari
+    // uses to unlock ProMotion (120 Hz) on iPhone 13 Pro+ / iPad Pro.
+    // rVFC fires at the display's native refresh rate; rAF is capped at 60 Hz
+    // on iOS regardless of hardware unless the page opts in this way.
+    if (canvas.requestVideoFrameCallback) {
+      _rafId = canvas.requestVideoFrameCallback(tick);
+    } else {
+      _rafId = requestAnimationFrame(tick);
+    }
   } else {
-    // Idle: run at ~10 fps to keep easing math ticking over
     _idleTimer = setTimeout(() => { _idleTimer = null; _rafId = requestAnimationFrame(tick); }, IDLE_INTERVAL);
   }
 }
