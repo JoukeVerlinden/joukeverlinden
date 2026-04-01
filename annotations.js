@@ -219,6 +219,58 @@ const HOTSPOTS = [
         zoom: 20,
         content: `27 Maart 1886 in Binche, Academie Bergen, Brussel. Woont in La Louvière (1913).Deelnames: 1913 (26j) `,
       },
+        {
+        type: "inscription",
+        id:    "inscription-1774182436495",
+        title: "T1 Gelukkig zijn zij...",
+        date:  "",
+        corners: [[246.22, 11.45], [269.90, 11.45], [269.90, 8.61], [246.22, 8.61]],
+        zoom: 33,
+        content: ``,
+        transcription: [
+          "Gelukkig zijn zij die een buis krijgen want zij zullen schitteren als de sterren aan het firmamentn"
+        ],
+        translation: ""
+      },
+      {
+        type: "inscription",
+        id:    "inscription-1774182579654",
+        title: "T2 Adieu, veau, vache, cochon ..",
+        date:  "",
+        corners: [[246.83, 8.41], [270.58, 8.41], [270.58, 5.48], [246.83, 5.48]],
+        zoom: 33,
+        content: ``,
+        transcription: ["Adieu, veau, vache, cochon .."
+
+        ],
+        translation: "Vaarwel, kalf, koe, varken"
+      },
+      {
+        type: "inscription",
+        id:    "inscription-1774182632829",
+        title: "T4 Jury, morituri te salutant!",
+        date:  "",
+        corners: [[276.69, 12.78], [296.04, 12.78], [296.04, 9.76], [276.69, 9.76]],
+        zoom: 27,
+        content: ``,
+        transcription: [
+          "Jury, morituri te salutant!"
+        ],
+        translation: "Jury, de stervenden brengen u een saluut!"
+      },
+      {
+        type: "inscription",
+        id:    "inscription-1774182685391",
+        title: "T4 Vaincus d’un jour, vainqueurs de demain!",
+        date:  "",
+        corners: [[284.25, 9.76], [302.22, 9.76], [302.22, 6.67], [284.25, 6.67]],
+        zoom: 25,
+        content: ``,
+        transcription: [ "Vaincus d’un jour, vainqueurs de demain!"
+
+        ],
+        translation: "Vandaag verslagen, morgen zegevierend!"
+      },
       {
         id:    "B1",
         title: "B1 Joe English",
@@ -307,6 +359,19 @@ const HOTSPOTS = [
         pitch: -6.7, yaw: 43.8,
         zoom: 20,
         content: ``,
+      },
+  {
+        type: "inscription",
+        id:    "T5",
+        title: "T5 Vriendelijk verzocht",
+        date:  "",
+        corners: [[18.65, 1.54], [45.16, 1.54], [45.16, -0.26], [18.65, -0.26]],
+        zoom: 25,
+        content: ``,
+        transcription: [ "VVriendelijk verzocht deze ignobel menschensmoelen eewig te respecteeren"
+
+        ],
+        translation: ""
       },
       {
         id:    "hotspot-1774181741443",
@@ -443,72 +508,9 @@ const HOTSPOTS = [
           "Da zal wel kunne zijn"
         ],
         translation: "It could be like that"
-      },
-      {
-        type: "inscription",
-        id:    "inscription-1774182436495",
-        title: "T1 Gelukkig zijn zij...",
-        date:  "",
-        corners: [[246.22, 11.45], [269.90, 11.45], [269.90, 8.61], [246.22, 8.61]],
-        zoom: 33,
-        content: ``,
-        transcription: [
-          "Gelukkig zijn zij die een buis krijgen want zij zullen schitteren als de sterren aan het firmamentn"
-        ],
-        translation: ""
-      },
-      {
-        type: "inscription",
-        id:    "inscription-1774182579654",
-        title: "T2 Adieu, veau, vache, cochon ..",
-        date:  "",
-        corners: [[246.83, 8.41], [270.58, 8.41], [270.58, 5.48], [246.83, 5.48]],
-        zoom: 33,
-        content: ``,
-        transcription: ["Adieu, veau, vache, cochon .."
-
-        ],
-        translation: "Vaarwel, kalf, koe, varken"
-      },
-      {
-        type: "inscription",
-        id:    "inscription-1774182632829",
-        title: "T4 Jury, morituri te salutant!",
-        date:  "",
-        corners: [[276.69, 12.78], [296.04, 12.78], [296.04, 9.76], [276.69, 9.76]],
-        zoom: 27,
-        content: ``,
-        transcription: [
-          "Jury, morituri te salutant!"
-        ],
-        translation: "Jury, de stervenden brengen u een saluut!"
-      },
-      {
-        type: "inscription",
-        id:    "inscription-1774182685391",
-        title: "T4 Vaincus d’un jour, vainqueurs de demain!",
-        date:  "",
-        corners: [[284.25, 9.76], [302.22, 9.76], [302.22, 6.67], [284.25, 6.67]],
-        zoom: 25,
-        content: ``,
-        transcription: [ "Vaincus d’un jour, vainqueurs de demain!"
-
-        ],
-        translation: "Vandaag verslagen, morgen zegevierend!"
-      },
-  {
-        type: "inscription",
-        id:    "T5",
-        title: "T5 Vriendelijk verzocht",
-        date:  "",
-        corners: [[18.65, 1.54], [45.16, 1.54], [45.16, -0.26], [18.65, -0.26]],
-        zoom: 25,
-        content: ``,
-        transcription: [ "VVriendelijk verzocht deze ignobel menschensmoelen eewig te respecteeren"
-
-        ],
-        translation: ""
       }
+
+  
 
 ];
 
