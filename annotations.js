@@ -22,21 +22,27 @@ const SITE_CONFIG = {
   
   // ── Welcome overlay ───────────────────────────────────
   // HTML allowed. Shown on startup before the user dismisses.
-  introHTML: `
-    Voor Erfgoeddag 2026 openen we digitaal de deuren van de
-    <strong>Antwerpse Koninklijke Academie van Schone Kunsten</strong>.<br>
-    Een voormalig toilet waar finalisten van de
-    <a href="https://felixarchief.antwerpen.be/nieuwspagina/de-prix-de-rome-een-schatkamer-vol-kunstenaarsgeschiedenis"
-       target="_blank">Prix de Rome</a> (1898–1913)
-    hun karikaturen achterlieten. Een unieke blik op het artistieke leven
-    in Antwerpen rond 1900, met een flinke dosis humor.
+  introHTML: `Voor Erfgoeddag 2026 openen we digitaal de deuren van de
+  <strong>Antwerpse Koninklijke Academie van Schone Kunsten </strong>en tonen we een voormalig 
+  toilet met humoristische karikaturen van <a href="https://felixarchief.antwerpen.be/nieuwspagina/de-prix-de-rome-een-schatkamer-vol-kunstenaarsgeschiedenis"
+       target="_blank">Prix de Rome-finalisten</a> (1898–1913), 
+  als unieke inkijk in het Antwerpse kunstleven rond 1900.
   `,
 
   // ── Colophon / info panel ─────────────────────────────
   // Shown when the user clicks the ⓘ button. HTML allowed.
-  colophonTitle: "Over dit project",
+  colophonTitle: "Achtergrond",
   colophonHTML: `
-    <p>
+  <h3>Achtergrond</h3>
+    <p>In het historische gebouw van de Koninklijke Academie voor Schone Kunsten bevindt 
+    zich een voormalige toiletruimte waar kunstenaars karikaturen en grappige bijschriften 
+    achterlieten op de muren. Ze werden gemaakt tussen 1898 en 1914 door de finalisten van de 
+    prestigieuze Prix de Rome, een nationale wedstrijd voor beloftevolle jonge kunstenaars. 
+    De muurschilderingen bieden een ongebruikelijk inzicht in de dagelijkse cultuur van het 
+    academisch kunstonderwijs rond 1900, met een flinke dosis humor. <br>
+    Naar aanleiding van Erfgoeddag 2026 opent de Faculteit 
+    Ontwerpwetenschappen van de Universiteit Antwerpen digitaal de deuren tot 
+    dit bijzondere stuk campuserfgoed.
       Dit digitale panorama werd ontwikkeld in het kader van
       <strong>Erfgoeddag 2026</strong> door de
       <strong>Faculteit Ontwerpwetenschappen, Universiteit Antwerpen</strong>
