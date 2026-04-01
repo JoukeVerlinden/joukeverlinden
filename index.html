@@ -3100,22 +3100,31 @@ document.addEventListener('visibilitychange', () => {
     _idleFrames = 0;
     scheduleTick(true);           // restart rAF loop
   } else {
+<<<<<<< HEAD
     // Hidden: cancel any pending tick
     if (_rafId !== null) {
       cancelAnimationFrame(_rafId);
       _rafId = null;
     }
     if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
+=======
+    // Hidden: cancel any pending tick — browser may throttle rAF anyway
+    // but we cancel explicitly to stop JS work and CSS animations too.
+    if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
+    if (_idleTimer) { clearTimeout(_idleTimer);     _idleTimer = null; }
+    // Pause CSS animations globally while hidden
+>>>>>>> parent of a7f7606 (Update index.html)
     document.body.style.animationPlayState = 'paused';
   }
 });
 
 function scheduleTick(immediate) {
-  if (!_pageVisible) return;
+  if (!_pageVisible) return;                // tab hidden — do nothing
   if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
   if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
 
   if (immediate || _idleFrames < IDLE_AFTER) {
+<<<<<<< HEAD
     _rafId = requestAnimationFrame(tick);
   } else {
     // Idle: throttle to ~10 fps. Force one real draw on wake so
@@ -3125,6 +3134,13 @@ function scheduleTick(immediate) {
       panoDirty = true;
       _rafId = requestAnimationFrame(tick);
     }, IDLE_INTERVAL);
+=======
+    // Active: run at display refresh rate
+    _rafId = requestAnimationFrame(tick);
+  } else {
+    // Idle: run at ~10 fps to keep easing math ticking over
+    _idleTimer = setTimeout(() => { _idleTimer = null; _rafId = requestAnimationFrame(tick); }, IDLE_INTERVAL);
+>>>>>>> parent of a7f7606 (Update index.html)
   }
 }
 
