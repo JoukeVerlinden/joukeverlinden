@@ -33,7 +33,6 @@ const SITE_CONFIG = {
   // Shown when the user clicks the ⓘ button. HTML allowed.
   colophonTitle: "Achtergrond",
   colophonHTML: `
-  <h3>Achtergrond</h3>
     <p>In het historische gebouw van de Koninklijke Academie voor Schone Kunsten bevindt 
     zich een voormalige toiletruimte waar kunstenaars karikaturen en grappige bijschriften 
     achterlieten op de muren. Ze werden gemaakt tussen 1898 en 1914 door de finalisten van de 
@@ -79,7 +78,7 @@ const SITE_CONFIG = {
   hints: [
     { icon: "↔", html: "<strong>Verkennen</strong> — sleep het beeld om rond te kijken" },
     { icon: "⊕", html: "<strong>Inzoomen</strong> — scroll of <kbd>&#43;</kbd>&thinsp;/&thinsp;<kbd>&#8722;</kbd>, op mobiel: knijp met twee vingers" },
-    { icon: "◷", html: "<strong>Tijdvak</strong> — wissel bovenaan tussen periodes; enkel markeringen uit die tijd worden getoond" },
+    { icon: "◷", html: "<strong>Tijdvak</strong> — wissel bovenaan van fotodocumentatie" },
     { icon: "⌂", html: "<strong>Beginpositie</strong> — huis-icoon rechtsonder" },
     { icon: "⟳", html: "<strong>Rondleiding</strong> — automatische tour via knop bovenaan" },
     { icon: "☰", html: "<strong>Annotaties</strong> — informatie per markering in het paneel onderaan", mobileOnly: true }
