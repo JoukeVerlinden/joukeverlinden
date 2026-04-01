@@ -368,7 +368,7 @@ const HOTSPOTS = [
         corners: [[18.65, 1.54], [45.16, 1.54], [45.16, -0.26], [18.65, -0.26]],
         zoom: 25,
         content: ``,
-        transcription: [ "VVriendelijk verzocht deze ignobel menschensmoelen eewig te respecteeren"
+        transcription: [ "Vriendelijk verzocht deze ignobel menschensmoelen eewig te respecteeren"
 
         ],
         translation: ""
@@ -434,7 +434,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181946871",
         title: "D8 Jean Colin?",
-        date:  "",
+        date:  "1910",
         pitch: 13.3, yaw: 51,
         zoom: 20,
         content: ``,
@@ -442,7 +442,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774181992435",
         title: "D9 Arthur Navez?",
-        date:  "",
+        date:  "1910",
         pitch: 20.1, yaw: 57.2,
         zoom: 35,
         content: ``,
@@ -450,7 +450,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182024041",
         title: "D10  Jan Van Puyenbroeck ? ",
-        date:  "",
+        date:  "1910",
         pitch: 13.7, yaw: 65.4,
         zoom: 35,
         content: ``,
@@ -458,7 +458,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182075334",
         title: "D11  Jan Van Puyenbroeck of Jean Colin?",
-        date:  "",
+        date:  "1910",
         pitch: 20.9, yaw: 74.8,
         zoom: 35,
         content: `Onze Jan die in de hemel zit `,
@@ -466,7 +466,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182101476",
         title: "D12 Louis Buisseret",
-        date:  "",
+        date:  "1910",
         pitch: 8.5, yaw: 87.6,
         zoom: 20,
         content: ``,
@@ -474,7 +474,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182127538",
         title: "D13 Emiel Vermeersch",
-        date:  "",
+        date:  "1910",
         pitch: 22.4, yaw: 89.4,
         zoom: 35,
         content: ``,
@@ -482,7 +482,7 @@ const HOTSPOTS = [
       {
         id:    "D14",
         title: "D14 Joe English",
-        date:  "",
+        date:  "1910",
         pitch: 20.2, yaw: 108.6,
         zoom: 20,
         content: ``,
@@ -491,7 +491,7 @@ const HOTSPOTS = [
       {
         id:    "hotspot-1774182185642",
         title: "D15  Oscar Coddron of Victor Regnart ?",
-        date:  "",
+        date:  "1910",
         pitch: 21.7, yaw: 117.2,
         zoom: 20,
         content: ``,
@@ -500,7 +500,7 @@ const HOTSPOTS = [
         type: "inscription",
         id:    "inscription-1774182291805",
         title: "T5 Da zal wel kunne zijn",
-        date:  "",
+        date:  "1910",
         corners: [[53.34, 10.33], [61.08, 10.33], [61.08, 6.86], [53.34, 6.86]],
         zoom: 20,
         content: ``,
