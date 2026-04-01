@@ -837,17 +837,15 @@ a {
     }
     #start-hint.visible { opacity: 1 !important; pointer-events: all !important; }
     #start-hint-inner {
-      padding: 20px 18px 14px;
-      gap: 10px;
+      padding: 14px 16px 12px;
+      gap: 0;
       max-width: 100%;
       width: 100%;
       max-height: 88vh;
       overflow-y: auto;
     }
-    #start-hint-welcome { font-size: 16px; padding-bottom: 9px; }
     .sh-text { font-size: 13px; line-height: 1.5; }
     .sh-icon { font-size: 15px; }
-    .sh-text kbd { display: none; }
     #start-hint-close {
       align-self: stretch;
       text-align: center;
@@ -968,21 +966,12 @@ a {
     background: rgba(10,8,5,0.80);
     border: 1px solid rgba(201,168,76,0.35);
     backdrop-filter: blur(12px);
-    padding: 20px 24px 16px;
+    padding: 16px 20px 14px;
     max-width: 420px;
     width: calc(100% - 48px);
     display: flex;
     flex-direction: column;
-    gap: 11px;
-  }
-  #start-hint-welcome {
-    font-family: var(--serif);
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--gold-light);
-    letter-spacing: 0.06em;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(201,168,76,0.2);
+    gap: 0;
   }
   .sh-row {
     display: flex;
@@ -1061,7 +1050,8 @@ a {
     color: var(--gold-light);
     border-bottom-color: var(--gold);
   }
-  .sh-tab-panel { display: flex; flex-direction: column; gap: 11px; }
+  .sh-tab-panel { display: flex; flex-direction: column; gap: 7px; padding-top: 4px; }
+  #sh-hints { display: flex; flex-direction: column; gap: 7px; }
   #sh-colophon-body {
     font-family: var(--body-serif);
     font-size: 13px;
@@ -1113,93 +1103,7 @@ a {
     border-color: rgba(201,168,76,0.55);
     color: #fff;
   }
-
-  /* ── COLOPHON MODAL ── */
-  #colophon-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(5,3,1,0.72);
-    z-index: 8500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    backdrop-filter: blur(6px);
-  }
-  #colophon-overlay.open { opacity: 1; pointer-events: all; }
-  #colophon-modal {
-    background: rgba(10,8,5,0.97);
-    border: 1px solid rgba(201,168,76,0.3);
-    max-width: 560px;
-    width: 100%;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  #colophon-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid rgba(201,168,76,0.15);
-    flex-shrink: 0;
-  }
-  #colophon-header h2 {
-    font-family: var(--serif);
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--gold-light);
-    letter-spacing: 0.06em;
-  }
-  #colophon-close {
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.25);
-    color: rgba(201,168,76,0.7);
-    font-size: 16px;
-    width: 28px; height: 28px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.18s;
-    border-radius: 1px;
-    flex-shrink: 0;
-  }
-  #colophon-close:hover { background: rgba(201,168,76,0.15); color: #fff; }
-  #colophon-body {
-    overflow-y: auto;
-    padding: 22px 28px 28px;
-    font-family: var(--body-serif);
-    font-size: 14px;
-    line-height: 1.75;
-    color: rgba(232,211,176,0.82);
-    scrollbar-width: thin;
-    scrollbar-color: rgba(201,168,76,0.2) transparent;
-  }
-  #colophon-body h3 {
-    font-family: var(--serif);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin: 20px 0 6px;
-  }
-  #colophon-body p { margin-bottom: 10px; }
-  #colophon-body strong { color: var(--parchment); font-weight: 500; }
-  #colophon-body a { color: var(--gold-light); }
-  #colophon-body .colophon-copy {
-    margin-top: 20px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(201,168,76,0.12);
-    font-size: 11.5px;
-    color: rgba(232,211,176,0.4);
-    font-style: italic;
-  }
   @media (max-width: 768px) {
-    #colophon-modal { max-height: 90vh; }
     #btn-info { width: 26px; height: 26px; font-size: 13px; }
   }
 </style>
@@ -1284,7 +1188,6 @@ a {
   <!-- Startup hint overlay — combined welcome + colophon -->
   <div id="start-hint">
     <div id="start-hint-inner">
-      <div id="start-hint-welcome"></div>
 
       <!-- Tab bar -->
       <div id="sh-tabs">
@@ -1297,30 +1200,8 @@ a {
         <div class="sh-row">
           <span class="sh-text" id="start-hint-intro"></span>
         </div>
-        <div class="sh-row">
-          <span class="sh-icon">↔</span>
-          <span class="sh-text"><strong>Verkennen</strong> — sleep het beeld om rond te kijken</span>
-        </div>
-        <div class="sh-row">
-          <span class="sh-icon">⊕</span>
-          <span class="sh-text"><strong>Inzoomen</strong> — scroll of gebruik <kbd>+</kbd> / <kbd>−</kbd> om markeringen zichtbaar te maken<span class="mobile-only"> · knijp met twee vingers</span></span>
-        </div>
-        <div class="sh-row">
-          <span class="sh-icon">◷</span>
-          <span class="sh-text"><strong>Tijdvak</strong> — gebruik de knoppen bovenaan om te wisselen tussen verschillende periodes; enkel de markeringen uit die tijd worden getoond</span>
-        </div>
-        <div class="sh-row">
-          <span class="sh-icon">⌂</span>
-          <span class="sh-text"><strong>Beginpositie</strong> — klik het huis-icoon rechtsonder om terug te keren</span>
-        </div>
-        <div class="sh-row">
-          <span class="sh-icon">⟳</span>
-          <span class="sh-text"><strong>Rondleiding</strong> — klik <em>Rondleiding</em> bovenaan voor een automatische tour</span>
-        </div>
-        <div class="sh-row mobile-only">
-          <span class="sh-icon">☰</span>
-          <span class="sh-text"><strong>Annotaties</strong> — zie informatie per markering in het paneel onderaan</span>
-        </div>
+        <!-- hint rows injected here by init() from SITE_CONFIG.hints -->
+        <div id="sh-hints"></div>
       </div>
 
       <!-- Tab: Colophon -->
@@ -1328,7 +1209,7 @@ a {
         <div id="sh-colophon-body"></div>
       </div>
 
-      <button id="start-hint-close">Begrepen</button>
+      <button id="start-hint-close">Sluiten</button>
     </div>
   </div>
 
@@ -1504,21 +1385,6 @@ a {
     </div>
   </div>
 
-</div>
-
-<!-- ═══════════════════════════════════════════════════════
-     COLOPHON / INFO MODAL
-════════════════════════════════════════════════════════ -->
-<div id="colophon-overlay">
-  <div id="colophon-modal">
-    <div id="colophon-header">
-      <h2 id="colophon-title">Over dit project</h2>
-      <button id="colophon-close" title="Sluiten">✕</button>
-    </div>
-    <div id="colophon-body">
-      <!-- populated by init() from SITE_CONFIG.colophonHTML -->
-    </div>
-  </div>
 </div>
 
 <!-- Dark flash overlay for panorama transitions -->
@@ -3237,8 +3103,9 @@ function tick() {
 function dismissHint() {
   const h = document.getElementById('start-hint');
   if (!h || !h.classList.contains('visible')) return;
+  h.classList.remove('visible');
   h.classList.add('fade-out');
-  setTimeout(() => h.remove(), 650);
+  setTimeout(() => h.classList.remove('fade-out'), 650);
 }
 document.getElementById('start-hint-close')?.addEventListener('click', dismissHint);
 
@@ -3756,22 +3623,24 @@ function init() {
     set('panel-label',   cfg.panelLabel);
     set('panel-heading', cfg.panelHeading);
     set('panel-meta',    cfg.panelMeta);
-    // Welcome title: "Welkom bij <first part of siteTitle>"
+    // Loading screen title (first part of siteTitle)
     const firstPart = cfg.siteTitle.split(/\s*[\u00b7·]\s*/)[0].trim();
-    const welcomeEl = document.getElementById('start-hint-welcome');
-    if (welcomeEl) welcomeEl.textContent = 'Welkom bij ' + firstPart;
-    // Loading screen title
     const loadingTitle = document.getElementById('loading-title');
     if (loadingTitle) loadingTitle.textContent = firstPart;
-    // Intro text from SITE_CONFIG.introHTML
+    // Intro text
     const introEl = document.getElementById('start-hint-intro');
     if (introEl && cfg.introHTML) introEl.innerHTML = cfg.introHTML;
-    // Colophon title + body — standalone modal
-    const colTitle = document.getElementById('colophon-title');
-    if (colTitle && cfg.colophonTitle) colTitle.textContent = cfg.colophonTitle;
-    const colBody = document.getElementById('colophon-body');
-    if (colBody && cfg.colophonHTML) colBody.innerHTML = cfg.colophonHTML;
-    // Colophon body — welcome overlay tab
+    // Hint rows from SITE_CONFIG.hints
+    const hintsEl = document.getElementById('sh-hints');
+    if (hintsEl && cfg.hints) {
+      hintsEl.innerHTML = cfg.hints.map(h =>
+        `<div class="sh-row${h.mobileOnly ? ' mobile-only' : ''}">` +
+          `<span class="sh-icon">${h.icon}</span>` +
+          `<span class="sh-text">${h.html}</span>` +
+        `</div>`
+      ).join('');
+    }
+    // Colophon body — welcome overlay tab only
     const shColBody = document.getElementById('sh-colophon-body');
     if (shColBody && cfg.colophonHTML) shColBody.innerHTML = cfg.colophonHTML;
   }
@@ -3786,21 +3655,24 @@ function init() {
     });
   });
 
-  // Info / colophon button
+  // ⓘ button — re-opens the start-hint overlay on the Colofon tab
   const btnInfo = document.getElementById('btn-info');
-  const colOverlay = document.getElementById('colophon-overlay');
-  const colClose   = document.getElementById('colophon-close');
-  if (btnInfo && colOverlay) {
+  if (btnInfo) {
     btnInfo.addEventListener('click', () => {
       playPing(780, 0.18);
-      colOverlay.classList.add('open');
-    });
-    colClose.addEventListener('click', () => colOverlay.classList.remove('open'));
-    colOverlay.addEventListener('click', e => {
-      if (e.target === colOverlay) colOverlay.classList.remove('open');
-    });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') colOverlay.classList.remove('open');
+      // Switch to colophon tab
+      document.querySelectorAll('.sh-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sh-tab-panel').forEach(p => p.style.display = 'none');
+      const colTab = document.querySelector('.sh-tab[data-tab="colophon"]');
+      if (colTab) colTab.classList.add('active');
+      const colPanel = document.getElementById('sh-panel-colophon');
+      if (colPanel) colPanel.style.display = 'flex';
+      // Show the overlay
+      const hint = document.getElementById('start-hint');
+      if (hint) {
+        hint.classList.remove('fade-out');
+        hint.classList.add('visible');
+      }
     });
   }
 
