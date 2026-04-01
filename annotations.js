@@ -73,6 +73,17 @@ const SITE_CONFIG = {
       toestemming.
     </p>
   `,
+// ── Welcome overlay hints ─────────────────────────────
+  // Each hint: { icon, html }  (icon is a single character, html may contain <strong>/<em>)
+  // Shown in order on the Welkom tab. Keep them short.
+  hints: [
+    { icon: "↔", html: "<strong>Verkennen</strong> — sleep het beeld om rond te kijken" },
+    { icon: "⊕", html: "<strong>Inzoomen</strong> — scroll of <kbd>&#43;</kbd>&thinsp;/&thinsp;<kbd>&#8722;</kbd>, op mobiel: knijp met twee vingers" },
+    { icon: "◷", html: "<strong>Tijdvak</strong> — wissel bovenaan tussen periodes; enkel markeringen uit die tijd worden getoond" },
+    { icon: "⌂", html: "<strong>Beginpositie</strong> — huis-icoon rechtsonder" },
+    { icon: "⟳", html: "<strong>Rondleiding</strong> — automatische tour via knop bovenaan" },
+    { icon: "☰", html: "<strong>Annotaties</strong> — informatie per markering in het paneel onderaan", mobileOnly: true }
+  ],
 
   // ── Time-lapse scenes ─────────────────────────────────
   // Each entry: { file, year, label }
