@@ -693,15 +693,15 @@ a {
 
   .entry-body strong { color: var(--parchment); font-weight: 500; }
   .entry-body em { font-style: italic; color: rgba(201,168,76,0.85); }
-
-  .entry-body .entry-image {
+ 
+ .entry-body .entry-image {
     width: calc(100% + 0px);
-    height: 130px;
-    object-fit: cover;
+   /* height: 130px;*/
+    object-fit: contain;/*cover;*/
     margin: 12px 0;
     border: 1px solid rgba(201,168,76,0.15);
     display: block;
-    filter: sepia(20%) brightness(0.85);
+    /*filter: sepia(20%) brightness(0.85);*/
     transition: filter 0.3s;
   }
   .annotation-entry.active .entry-body .entry-image { filter: sepia(10%) brightness(0.95); }
