@@ -3249,7 +3249,7 @@ function updateHotspots() {
       if (!el) return;
       const { x, y: py, behind } = projectPoint(hs.yaw, hs.pitch);
       const onScreen = !behind && x > -40 && x < W + 40 && py > -40 && py < H + 40;
-      const visible  = onScreen && fovH < 85;
+      const visible  = onScreen && fovH < 86;
       el.style.left = x + 'px';
       el.style.top  = py + 'px';
       el.style.opacity       = visible ? '1' : '0';
