@@ -90,8 +90,8 @@ const SITE_CONFIG = {
   // their date year <= the scene year. Undated hotspots always show.
   scenes: [
     { file: "theroom1.jpg", year: 1908, label: "ca. 1908", mobileLabel: "1908" },
-    { file: "theroom2.jpg", year: 2025, label: "ca. 2025", mobileLabel: "2025" },
-    { file: "theroom3.jpg", year: 2026, label: "2026",     mobileLabel: "'26" }
+    { file: "theroom2.jpg", year: 2025, label: "ca. 2025", mobileLabel: "2025" }
+  /*  .{ file: "theroom3.jpg", year: 2026, label: "2026",     mobileLabel: "'26" } */
   ]
 };
 
