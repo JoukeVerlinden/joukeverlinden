@@ -683,13 +683,16 @@ a {
   }
 
   .entry-date {
-    font-family: var(--accent-serif);
-    font-style: italic;
-    font-size: 11px;
-    color: var(--gold-dim);
+    font-family: var(--serif);
+    font-style: normal;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.12em;
     margin-bottom: 10px;
     padding-left: 36px;
   }
+  .entry-date:empty { display: none; }
 
   .entry-body {
     font-family: var(--body-serif);
@@ -790,6 +793,22 @@ a {
     opacity: 0.55;
     flex-shrink: 0;
     font-size: 9px;
+  }
+  .see-also-chip-title {
+    flex: 1;
+  }
+  .see-also-chip-date {
+    font-family: var(--serif);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: rgba(201,168,76,0.12);
+    border-radius: 2px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   /* ── DIVIDER (resizer) ── */
@@ -3484,9 +3503,13 @@ function buildPanel() {
         const target = HOTSPOTS.find(h => h.id === lid);
         if (!target) return '';
         const typeIcon = target.type === 'inscription' ? '▭' : '◉';
+        const dateSpan = target.date
+          ? '<span class="see-also-chip-date">' + target.date + '</span>'
+          : '';
         return '<button class="see-also-chip" data-goto="' + lid + '">' +
           '<span class="see-also-chip-icon">' + typeIcon + '</span>' +
-          target.title +
+          '<span class="see-also-chip-title">' + target.title + '</span>' +
+          dateSpan +
         '</button>';
       }).filter(Boolean).join('');
       if (chips) {
